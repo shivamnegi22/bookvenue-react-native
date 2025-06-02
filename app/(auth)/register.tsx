@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Platform, KeyboardAvoidingView, ScrollView, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UserPlus, Mail, Lock, User, AlertCircle } from 'lucide-react-native';
 import { Formik } from 'formik';
@@ -20,22 +19,10 @@ const RegisterSchema = Yup.object().shape({
 });
 
 export default function RegisterScreen() {
-  const { register } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
-  const handleRegister = async (values: { 
-    name: string; 
-    email: string; 
-    password: string; 
-    isVenueOwner: boolean;
-  }) => {
-    setError(null);
-    try {
-      await register(values.name, values.email, values.password, values.isVenueOwner);
-      router.replace('/(tabs)');
-    } catch (error: any) {
-      setError(error.message || 'Failed to register. Please try again.');
-    }
+  const handleRegister = async () => {
+    router.replace('/(tabs)');
   };
 
   return (

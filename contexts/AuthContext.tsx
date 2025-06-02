@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authApi } from '@/api/authApi';
 
-type User = {
+export type User = {
   id: string;
   name: string;
   email: string;
@@ -13,15 +13,16 @@ type User = {
 type AuthContextType = {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (identifier: string, otp: string) => Promise<void>;
   register: (name: string, email: string, password: string, isVenueOwner: boolean) => Promise<void>;
   logout: () => Promise<void>;
   updateUserProfile: (data: Partial<User>) => Promise<void>;
+  refreshUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
@@ -34,74 +35,86 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
     const checkLoggedIn = async () => {
       try {
+        const token = await AsyncStorage.getItem('token');
         const userJson = await AsyncStorage.getItem('user');
-        if (userJson) {
+        if (token && userJson) {
           setUser(JSON.parse(userJson));
         }
       } catch (error) {
-        console.error('Error checking logged in status:', error);
+        console.error('Error checking logged-in status:', error);
       } finally {
         setLoading(false);
       }
     };
-    
+
     checkLoggedIn();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (identifier: string, otp: string): Promise<void> => {
     try {
-      const userData = await authApi.login(email, password);
-      setUser(userData);
-      await AsyncStorage.setItem('user', JSON.stringify(userData));
+      console.log('Login attempt:', { identifier, otp });
+      const userData = await authApi.verifyOTP(identifier, otp);
+      console.log('Login successful:', userData);
     } catch (error) {
+      console.error('Login failed:', error);
       throw error;
     }
   };
 
-  const register = async (name: string, email: string, password: string, isVenueOwner: boolean) => {
+  const register = async (
+    name: string,
+    email: string,
+    password: string,
+    isVenueOwner: boolean
+  ): Promise<void> => {
     try {
       const userData = await authApi.register(name, email, password, isVenueOwner);
       setUser(userData);
-      await AsyncStorage.setItem('user', JSON.stringify(userData));
     } catch (error) {
+      console.error('Registration failed:', error);
       throw error;
     }
   };
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     try {
-      await AsyncStorage.removeItem('user');
+      await authApi.logout();
       setUser(null);
     } catch (error) {
+      console.error('Logout failed:', error);
       throw error;
     }
   };
-  
-  const updateUserProfile = async (data: Partial<User>) => {
+
+  const updateUserProfile = async (data: Partial<User>): Promise<void> => {
+    if (!user) throw new Error('User not logged in');
+
     try {
-      if (!user) return;
-      
-      const updatedUser = {
-        ...user,
-        ...data
-      };
-      
+      const updatedUser = await authApi.updateProfile({ ...user, ...data });
       setUser(updatedUser);
       await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
-      
-      // In a real app, this would also update the user on the server
-      // await authApi.updateProfile(updatedUser);
-      
     } catch (error) {
+      console.error('Profile update failed:', error);
       throw error;
+    }
+  };
+
+  const refreshUser = async (): Promise<void> => {
+    try {
+      const updatedUser = await authApi.getProfile();
+      setUser(updatedUser);
+      await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUserProfile }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, register, logout, updateUserProfile, refreshUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

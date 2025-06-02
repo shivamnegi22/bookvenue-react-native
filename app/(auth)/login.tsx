@@ -1,30 +1,168 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Platform, KeyboardAvoidingView, ScrollView, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View, Text, StyleSheet, TouchableOpacity, Image, TextInput,
+  Platform, KeyboardAvoidingView, ScrollView, ActivityIndicator
+} from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LogIn, Mail, Lock, CircleAlert as AlertCircle } from 'lucide-react-native';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-
-const LoginSchema = Yup.object().shape({
-  email: Yup.string().email('Invalid email').required('Email is required'),
-  password: Yup.string().required('Password is required')
-});
+import { Mail, Phone, CircleAlert as AlertCircle, ArrowRight } from 'lucide-react-native';
+import { authApi } from '@/api/authApi';
 
 export default function LoginScreen() {
   const { login } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [showOTP, setShowOTP] = useState(false);
+  const [identifier, setIdentifier] = useState('');
+  const [otp, setOTP] = useState('');
+  const [showInput, setShowInput] = useState<'email' | 'phone' | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
 
-  const handleLogin = async (values: { email: string; password: string }) => {
+  // Timer logic for resend OTP
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer(prev => {
+          if (prev <= 1 && interval) clearInterval(interval);
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [resendTimer]);
+
+  const handleMethodSelect = (method: 'email' | 'phone') => {
+    setShowInput(method);
+    setIdentifier('');
+    setShowOTP(false);
+    setOTP('');
     setError(null);
-    try {
-      await login(values.email, values.password);
-      router.replace('/(tabs)');
-    } catch (error: any) {
-      setError(error.message || 'Failed to login. Please try again.');
+  };
+
+  const validateInput = () => {
+    if (showInput === 'email') {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+    } else {
+      return /^[0-9]{10}$/.test(identifier);
     }
   };
+
+  const handleSendOTP = async () => {
+    if (!validateInput()) {
+      setError(`Invalid ${showInput === 'email' ? 'email address' : 'phone number'}`);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      await authApi.login(identifier);
+      setShowOTP(true);
+      setResendTimer(60);
+    } catch (err: any) {
+      setError(err?.response?.data?.message || err.message || 'Failed to send OTP');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // const handleVerifyOTP = async () => {
+  //   if (!/^[0-9]{6}$/.test(otp)) {
+  //     setError('Please enter a valid 6-digit OTP');
+  //     return;
+  //   }
+
+  //   setLoading(true);
+  //   setError(null);
+
+  //   try {
+  //     await login(identifier, otp);
+  //     router.replace('/(tabs)');
+  //   } catch (err: any) {
+  //     setError(err?.response?.data?.message || err.message || 'OTP verification failed');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+// const handleVerifyOTP = async () => {
+//   const isMobileValid = mobile !== '' && /^[0-9]{10}$/.test(mobile);
+//   const isEmailValid = email !== '' && /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
+//   const isOtpValid = otp !== '' && /^[0-9]{6}$/.test(otp);
+
+//   if (isMobileValid || isEmailValid) {
+//     if (isOtpValid) {
+//       setLoading(true);
+//       setError(null);
+
+//       try {
+//         if (isMobileValid) {
+//           await verifyOTP.mutateAsync({
+//             mobile,
+//             otp,
+//             url: '/verify-otp',
+//           });
+//         } else {
+//           await verifyEmailOTP.mutateAsync({
+//             email,
+//             otp,
+//             url: '/verify-otp-via-email',
+//           });
+//         }
+
+//         await login(email || mobile, otp); // Assuming login handles both internally
+//         router.replace('/(tabs)');
+//       } catch (err: any) {
+//         setError(err?.response?.data?.message || err.message || 'OTP verification failed');
+//       } finally {
+//         setLoading(false);
+//       }
+//     } else {
+//       setError('Invalid OTP.');
+//     }
+//   } else {
+//     setError('Invalid Mobile No. or Email.');
+//   }
+// };
+const handleVerifyOTP = async () => {
+  const isEmail = showInput === 'email';
+  const isMobile = showInput === 'phone';
+
+  const isMobileValid = isMobile && /^[0-9]{10}$/.test(identifier);
+  const isEmailValid = isEmail && /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(identifier);
+  const isOtpValid = otp !== '' && /^[0-9]{6}$/.test(otp);
+
+  if (isMobileValid || isEmailValid) {
+    if (isOtpValid) {
+      setLoading(true);
+      setError(null);
+
+      try {
+        if (isMobileValid) {
+          await authApi.verifyOTP(identifier, otp);
+        } else {
+          console.log('Verifying email OTP:', { identifier, otp });
+          await authApi.verifyOTP(identifier, otp);
+        }
+
+        // await login(identifier, otp); // Handles both mobile/email
+        router.replace('/(tabs)');
+      } catch (err: any) {
+        setError(err?.response?.data?.message || err.message || 'OTP verification failed');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setError('Invalid OTP.');
+    }
+  } else {
+    setError('Invalid Mobile No. or Email.');
+  }
+};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -34,9 +172,9 @@ export default function LoginScreen() {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.logoContainer}>
-            <Image 
-              source={{ uri: 'https://images.pexels.com/photos/3775042/pexels-photo-3775042.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }} 
-              style={styles.logo} 
+            <Image
+              source={{ uri: 'https://images.pexels.com/photos/3775042/pexels-photo-3775042.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }}
+              style={styles.logo}
             />
             <Text style={styles.appName}>BookVenue</Text>
             <Text style={styles.tagline}>Find and book venues with ease</Text>
@@ -49,67 +187,97 @@ export default function LoginScreen() {
             </View>
           )}
 
-          <Formik
-            initialValues={{ email: 'shivamnegi2207@gmail.com', password: '123' }}
-            validationSchema={LoginSchema}
-            onSubmit={handleLogin}
-          >
-            {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
-              <View style={styles.formContainer}>
-                <View style={styles.inputContainer}>
-                  <Mail size={20} color="#6B7280" style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    placeholderTextColor="#9CA3AF"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    onChangeText={handleChange('email')}
-                    onBlur={handleBlur('email')}
-                    value={values.email}
-                  />
-                </View>
-                {touched.email && errors.email && (
-                  <Text style={styles.validationError}>{errors.email}</Text>
-                )}
+          {!showInput && (
+            <View style={styles.methodContainer}>
+              <TouchableOpacity
+                style={styles.methodButton}
+                onPress={() => handleMethodSelect('email')}
+              >
+                <Mail size={24} color="#2563EB" />
+                <Text style={styles.methodButtonText}>Continue with Email</Text>
+              </TouchableOpacity>
 
-                <View style={styles.inputContainer}>
-                  <Lock size={20} color="#6B7280" style={styles.inputIcon} />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    placeholderTextColor="#9CA3AF"
-                    secureTextEntry
-                    onChangeText={handleChange('password')}
-                    onBlur={handleBlur('password')}
-                    value={values.password}
-                  />
-                </View>
-                {touched.password && errors.password && (
-                  <Text style={styles.validationError}>{errors.password}</Text>
-                )}
+              <TouchableOpacity
+                style={styles.methodButton}
+                onPress={() => handleMethodSelect('phone')}
+              >
+                <Phone size={24} color="#2563EB" />
+                <Text style={styles.methodButtonText}>Continue with Phone</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
-                <TouchableOpacity style={styles.forgotPassword}>
-                  <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity 
-                  style={styles.loginButton} 
-                  onPress={() => handleSubmit()}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <ActivityIndicator color="#FFFFFF" />
-                  ) : (
-                    <>
-                      <LogIn size={20} color="#FFFFFF" />
-                      <Text style={styles.loginButtonText}>Login</Text>
-                    </>
-                  )}
-                </TouchableOpacity>
+          {showInput && !showOTP && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>
+                Enter your {showInput === 'email' ? 'email address' : 'phone number'}
+              </Text>
+              <View style={styles.inputWrapper}>
+                {showInput === 'phone' && <Text style={styles.countryCode}>+91</Text>}
+                <TextInput
+                  style={[styles.input, showInput === 'phone' && styles.phoneInput]}
+                  placeholder={showInput === 'email' ? 'Email address' : 'Phone number'}
+                  value={identifier}
+                  onChangeText={setIdentifier}
+                  keyboardType={showInput === 'email' ? 'email-address' : 'phone-pad'}
+                  autoCapitalize="none"
+                  maxLength={showInput === 'phone' ? 10 : undefined}
+                />
               </View>
-            )}
-          </Formik>
+              <TouchableOpacity
+                style={[styles.actionButton, !validateInput() && styles.actionButtonDisabled]}
+                onPress={handleSendOTP}
+                disabled={!validateInput() || loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <>
+                    <Text style={styles.actionButtonText}>Continue</Text>
+                    <ArrowRight size={20} color="#FFFFFF" />
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {showOTP && (
+            <View style={styles.otpContainer}>
+              <Text style={styles.otpTitle}>Enter Verification Code</Text>
+              <Text style={styles.otpSubtitle}>
+                We've sent a 6-digit code to your {showInput === 'email' ? 'email' : 'phone'}
+              </Text>
+              <TextInput
+                style={styles.otpInput}
+                placeholder="Enter 6-digit OTP"
+                value={otp}
+                onChangeText={setOTP}
+                keyboardType="number-pad"
+                maxLength={6}
+              />
+              <TouchableOpacity
+                style={[styles.actionButton, otp.length !== 6 && styles.actionButtonDisabled]}
+                onPress={handleVerifyOTP}
+                disabled={otp.length !== 6 || loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.actionButtonText}>Verify & Continue</Text>
+                )}
+              </TouchableOpacity>
+
+              {resendTimer > 0 ? (
+                <Text style={styles.resendTimer}>
+                  Resend OTP in {resendTimer} seconds
+                </Text>
+              ) : (
+                <TouchableOpacity onPress={handleSendOTP} disabled={loading}>
+                  <Text style={styles.resendButtonText}>Resend OTP</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
 
           <View style={styles.registerContainer}>
             <Text style={styles.registerText}>Don't have an account?</Text>
@@ -124,122 +292,113 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB'
-  },
-  keyboardAvoid: {
-    flex: 1
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 24
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginTop: 40,
-    marginBottom: 32
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    borderRadius: 20,
-    marginBottom: 16
-  },
-  appName: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 28,
-    color: '#1F2937',
-    marginBottom: 8
-  },
-  tagline: {
-    fontFamily: 'Inter-Regular',
-    fontSize: 16,
-    color: '#6B7280'
-  },
+  container: { flex: 1, backgroundColor: '#F9FAFB' },
+  keyboardAvoid: { flex: 1 },
+  scrollContent: { flexGrow: 1, padding: 24 },
+  logoContainer: { alignItems: 'center', marginTop: 40, marginBottom: 32 },
+  logo: { width: 100, height: 100, borderRadius: 20, marginBottom: 16 },
+  appName: { fontFamily: 'Inter-Bold', fontSize: 28, color: '#1F2937', marginBottom: 8 },
+  tagline: { fontFamily: 'Inter-Regular', fontSize: 16, color: '#6B7280' },
   errorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FEF2F2',
     padding: 12,
     borderRadius: 8,
-    marginBottom: 16
+    marginBottom: 16,
   },
-  errorText: {
+  errorText: { fontFamily: 'Inter-Medium', fontSize: 14, color: '#EF4444', marginLeft: 8 },
+  methodContainer: { gap: 16 },
+  methodButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    padding: 16,
+    gap: 12,
+  },
+  methodButtonText: { fontFamily: 'Inter-SemiBold', fontSize: 16, color: '#1F2937' },
+  inputContainer: { gap: 16 },
+  inputLabel: {
     fontFamily: 'Inter-Medium',
-    fontSize: 14,
-    color: '#EF4444',
-    marginLeft: 8
+    fontSize: 16,
+    color: '#1F2937',
+    marginBottom: 8,
   },
-  formContainer: {
-    marginBottom: 24
-  },
-  inputContainer: {
+  inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 8,
-    paddingHorizontal: 12,
-    marginBottom: 16,
-    height: 56
+    paddingHorizontal: 16,
   },
-  inputIcon: {
-    marginRight: 12
-  },
+  countryCode: { fontFamily: 'Inter-Medium', fontSize: 16, color: '#1F2937', marginRight: 8 },
   input: {
     flex: 1,
     fontFamily: 'Inter-Regular',
     fontSize: 16,
-    color: '#1F2937'
+    color: '#1F2937',
+    paddingVertical: 12,
   },
-  validationError: {
-    fontFamily: 'Inter-Regular',
-    fontSize: 14,
-    color: '#EF4444',
-    marginTop: -12,
-    marginBottom: 12,
-    marginLeft: 4
-  },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginBottom: 24
-  },
-  forgotPasswordText: {
-    fontFamily: 'Inter-Medium',
-    fontSize: 14,
-    color: '#2563EB'
-  },
-  loginButton: {
+  phoneInput: { paddingLeft: 8 },
+  actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#2563EB',
     borderRadius: 8,
-    paddingVertical: 16,
-    marginBottom: 24
+    padding: 16,
+    gap: 8,
   },
-  loginButtonText: {
-    fontFamily: 'Inter-SemiBold',
+  actionButtonDisabled: { backgroundColor: '#93C5FD' },
+  actionButtonText: { fontFamily: 'Inter-SemiBold', fontSize: 16, color: '#FFFFFF' },
+  otpContainer: { gap: 16 },
+  otpTitle: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 20,
+    color: '#1F2937',
+    textAlign: 'center',
+  },
+  otpSubtitle: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  otpInput: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    padding: 16,
     fontSize: 16,
-    color: '#FFFFFF',
-    marginLeft: 8
+    textAlign: 'center',
+    letterSpacing: 8,
+  },
+  resendTimer: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  resendButtonText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: '#2563EB',
+    textAlign: 'center',
+    marginTop: 8,
   },
   registerContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: 24,
   },
-  registerText: {
-    fontFamily: 'Inter-Regular',
-    fontSize: 14,
-    color: '#6B7280'
-  },
-  registerLink: {
-    fontFamily: 'Inter-SemiBold',
-    fontSize: 14,
-    color: '#2563EB',
-    marginLeft: 4
-  }
+  registerText: { fontFamily: 'Inter-Regular', fontSize: 14, color: '#6B7280' },
+  registerLink: { fontFamily: 'Inter-SemiBold', fontSize: 14, color: '#2563EB', marginLeft: 4 },
 });

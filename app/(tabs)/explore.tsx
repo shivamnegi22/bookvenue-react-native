@@ -309,8 +309,8 @@ export default function ExploreScreen() {
                 <MapComponents.MapView
                   style={styles.map}
                   initialRegion={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
+                    latitude: 30.32552,
+                    longitude: 78.04662,
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
                   }}

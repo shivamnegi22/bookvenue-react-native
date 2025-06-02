@@ -1,88 +1,116 @@
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// In a real app, this would connect to a Laravel backend
-// For demo purposes, we're using simulated responses
+const API_URL = 'https://admin.bookvenue.app/api';
 
-const mockUsers = [
-  {
-    id: '1',
-    name: 'John Doe',
-    email: 'john@example.com',
-    password: 'password123',
-    isVenueOwner: false,
-    profileImage: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
   },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    password: 'password123',
-    isVenueOwner: true,
-    profileImage: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+});
+
+// Add token to requests
+api.interceptors.request.use(async (config) => {
+  const token = await AsyncStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-];
+  return config;
+});
 
 export const authApi = {
-  login: async (email: string, password: string) => {
-    // Simulate API request
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const user = mockUsers.find(u => u.email === email && u.password === password);
-    
-    if (!user) {
-      throw new Error('Invalid email or password');
+  // Send OTP
+  login: async (identifier: string) => {
+    try {
+      const endpoint = identifier.includes('@') ? '/login-via-email' : '/login';
+      const payload = identifier.includes('@')
+        ? { email: identifier }
+        : { mobile: identifier };
+      await api.post(endpoint, payload);
+      return
+    } catch (error: any) {
+      console.error('Login Error:', error.response?.data || error);
+      throw new Error(error.response?.data?.message || 'Failed to send OTP');
     }
-    
-    const { password: _, ...userWithoutPassword } = user;
-    return userWithoutPassword;
   },
-  
+
+  // Verify OTP
+  verifyOTP: async (identifier: string, otp: string) => {
+    try {
+      const isEmail = identifier.includes('@');
+      const endpoint = isEmail ? '/verify-otp-via-email' : '/verify-otp';
+      const payload = {
+        [isEmail ? 'email' : 'mobile']: identifier,
+        otp
+      };
+      const response = await api.post(endpoint, payload);
+      if (response.data.token) {
+        await AsyncStorage.setItem('token', response.data.token);
+        if (response.config.data) {
+          await AsyncStorage.setItem('user', JSON.stringify(response.config.data));
+        }
+      }     
+    } catch (error: any) {
+      console.error('OTP Verification Error:', error.response?.data || error);
+      throw new Error(error.response?.data?.message || 'Failed to verify OTP');
+    }
+  },
+
+  getProfile: async () => {
+    try {
+      const response = await api.get('/get-user-role');
+      return response.data.user;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to get profile');
+    }
+  },
+
   register: async (name: string, email: string, password: string, isVenueOwner: boolean) => {
-    // Simulate API request
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Check if email already exists
-    if (mockUsers.some(u => u.email === email)) {
-      throw new Error('Email already in use');
+    try {
+      const response = await api.post('/register', {
+        name,
+        email,
+        password,
+        role: isVenueOwner ? 'provider' : 'user'
+      });
+
+      const { user, token } = response.data;
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+      return user;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Registration failed');
     }
-    
-    // Create new user
-    const newUser = {
-      id: (mockUsers.length + 1).toString(),
-      name,
-      email,
-      password,
-      isVenueOwner,
-      profileImage: isVenueOwner
-        ? 'https://images.pexels.com/photos/532220/pexels-photo-532220.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
-        : 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
-    };
-    
-    // In a real app, this would be saved to the database
-    mockUsers.push(newUser);
-    
-    const { password: _, ...userWithoutPassword } = newUser;
-    return userWithoutPassword;
   },
-  
+
   updateProfile: async (userData: any) => {
-    // Simulate API request
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // In a real app, this would update the user in the database
-    const userIndex = mockUsers.findIndex(u => u.id === userData.id);
-    
-    if (userIndex === -1) {
-      throw new Error('User not found');
+    try {
+      const formData = new FormData();
+      
+      Object.keys(userData).forEach(key => {
+        formData.append(key, userData[key]);
+      });
+      
+      const response = await api.post('/profileUpdate', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      return response.data.user;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to update profile');
     }
-    
-    mockUsers[userIndex] = {
-      ...mockUsers[userIndex],
-      ...userData,
-      password: mockUsers[userIndex].password // Keep the existing password
-    };
-    
-    const { password: _, ...userWithoutPassword } = mockUsers[userIndex];
-    return userWithoutPassword;
+  },
+
+  logout: async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+      await AsyncStorage.removeItem('user');
+    } catch (error: any) {
+      throw new Error('Logout failed');
+    }
   }
 };
