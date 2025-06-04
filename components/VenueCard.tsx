@@ -13,7 +13,10 @@ export default function VenueCard({ venue, size }: VenueCardProps) {
   const router = useRouter();
   
   const handlePress = () => {
-    router.push(`/venue/${venue.id}`);
+    router.push({
+      pathname: '/venue/[id]',
+      params: { id: venue.slug }
+    });
   };
   
   if (size === 'large') {

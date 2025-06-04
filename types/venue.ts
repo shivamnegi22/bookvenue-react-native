@@ -1,5 +1,6 @@
 export type Venue = {
   id: string;
+  slug: string;
   name: string;
   description: string;
   location: string;

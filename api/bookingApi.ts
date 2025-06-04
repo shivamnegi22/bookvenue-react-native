@@ -1,132 +1,104 @@
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Booking } from '@/types/booking';
 
-// In a real app, this would connect to a Laravel backend
-// For demo purposes, we're using simulated responses
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000/api';
 
-const mockBookings: Booking[] = [
-  {
-    id: '1',
-    venue: {
-      id: '1',
-      name: 'Central Football Ground',
-      location: 'Downtown, San Francisco',
-      images: [
-        'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-        'https://images.pexels.com/photos/114296/pexels-photo-114296.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
-      ],
-      coordinates: {
-        latitude: 37.78825,
-        longitude: -122.4324
-      }
-    },
-    date: '2025-04-25',
-    startTime: '14:00',
-    endTime: '16:00',
-    totalAmount: 80,
-    status: 'confirmed'
-  },
-  {
-    id: '2',
-    venue: {
-      id: '2',
-      name: 'Golden Gate Tennis Club',
-      location: 'Marina District, San Francisco',
-      images: [
-        'https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-        'https://images.pexels.com/photos/2352251/pexels-photo-2352251.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
-      ],
-      coordinates: {
-        latitude: 37.80136,
-        longitude: -122.4431
-      }
-    },
-    date: '2025-04-26',
-    startTime: '10:00',
-    endTime: '12:00',
-    totalAmount: 60,
-    status: 'pending'
-  },
-  {
-    id: '3',
-    venue: {
-      id: '3',
-      name: 'Urban Basketball Court',
-      location: 'Mission District, San Francisco',
-      images: [
-        'https://images.pexels.com/photos/1752757/pexels-photo-1752757.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-        'https://images.pexels.com/photos/945471/pexels-photo-945471.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
-      ],
-      coordinates: {
-        latitude: 37.7599,
-        longitude: -122.4148
-      }
-    },
-    date: '2025-03-15',
-    startTime: '18:00',
-    endTime: '20:00',
-    totalAmount: 45,
-    status: 'confirmed'
+// Create axios instance
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
   }
-];
+});
+
+// Add token to requests
+api.interceptors.request.use(async (config) => {
+  const token = await AsyncStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export const bookingApi = {
   getBookings: async () => {
-    // Simulate API request
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return mockBookings;
+    try {
+      const response = await api.get('/my-bookings');
+      return response.data.bookings.map((booking: any) => ({
+        id: booking.id.toString(),
+        venue: {
+          id: booking.facility.id.toString(),
+          slug: booking.facility.slug,
+          name: booking.facility.name,
+          location: booking.facility.address,
+          images: booking.facility.images?.split(',') || [],
+          coordinates: {
+            latitude: parseFloat(booking.facility.latitude || '0'),
+            longitude: parseFloat(booking.facility.longitude || '0')
+          }
+        },
+        date: booking.date,
+        startTime: booking.start_time,
+        endTime: booking.end_time,
+        totalAmount: parseFloat(booking.total_amount),
+        status: booking.status.toLowerCase()
+      }));
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch bookings');
+    }
   },
   
   getBookingById: async (id: string) => {
-    // Simulate API request
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const booking = mockBookings.find(b => b.id === id);
-    
-    if (!booking) {
-      throw new Error('Booking not found');
+    try {
+      const response = await api.get('/my-bookings');
+      const booking = response.data.bookings.find((b: any) => b.id.toString() === id);
+      
+      if (!booking) {
+        throw new Error('Booking not found');
+      }
+      
+      return {
+        id: booking.id.toString(),
+        venue: {
+          id: booking.facility.id.toString(),
+          slug: booking.facility.slug,
+          name: booking.facility.name,
+          location: booking.facility.address,
+          images: booking.facility.images?.split(',') || [],
+          coordinates: {
+            latitude: parseFloat(booking.facility.latitude || '0'),
+            longitude: parseFloat(booking.facility.longitude || '0')
+          }
+        },
+        date: booking.date,
+        startTime: booking.start_time,
+        endTime: booking.end_time,
+        totalAmount: parseFloat(booking.total_amount),
+        status: booking.status.toLowerCase()
+      };
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch booking');
     }
-    
-    return booking;
   },
   
   createBooking: async (bookingData: any) => {
-    // Simulate API request
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // In a real app, this would send the booking data to the server
-    // and return the created booking
-    
-    const newBooking = {
-      id: (mockBookings.length + 1).toString(),
-      ...bookingData,
-      venue: mockBookings[0].venue, // For demo purposes
-      status: 'confirmed'
-    };
-    
-    // In a real app, this would be saved to the database
-    mockBookings.push(newBooking as Booking);
-    
-    return newBooking;
-  },
-  
-  cancelBooking: async (id: string) => {
-    // Simulate API request
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const bookingIndex = mockBookings.findIndex(b => b.id === id);
-    
-    if (bookingIndex === -1) {
-      throw new Error('Booking not found');
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      const response = await api.post('/booking', bookingData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      return response.data.booking;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to create booking');
     }
-    
-    // In a real app, this would update the booking in the database
-    mockBookings[bookingIndex] = {
-      ...mockBookings[bookingIndex],
-      status: 'cancelled'
-    };
-    
-    return mockBookings[bookingIndex];
   }
 };

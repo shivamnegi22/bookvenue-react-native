@@ -34,10 +34,8 @@ export default function VenueDetailScreen() {
     const fetchVenue = async () => {
       try {
         if (!id) return;
-        const response = await venueApi.getVenueById(id);
+        const response = await venueApi.getVenueBySlug(id);
         setVenue(response);
-        
-        // Set initial date selection
         setSelectedDate(nextDays[0].fullDate);
       } catch (error) {
         console.error('Error fetching venue:', error);
