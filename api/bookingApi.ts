@@ -2,9 +2,8 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Booking } from '@/types/booking';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_URL = 'https://admin.bookvenue.app/api';
 
-// Create axios instance
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -26,26 +25,24 @@ export const bookingApi = {
   getBookings: async () => {
     try {
       const response = await api.get('/my-bookings');
+      console.log('Fetched bookings:', response.data.bookings);
       return response.data.bookings.map((booking: any) => ({
-        id: booking.id.toString(),
+        id: booking.id || Math.random().toString(),
         venue: {
-          id: booking.facility.id.toString(),
-          slug: booking.facility.slug,
-          name: booking.facility.name,
-          location: booking.facility.address,
-          images: booking.facility.images?.split(',') || [],
-          coordinates: {
-            latitude: parseFloat(booking.facility.latitude || '0'),
-            longitude: parseFloat(booking.facility.longitude || '0')
-          }
+          id: booking.id || Math.random().toString(),
+          name: booking.facility,
+          type: booking.court,
+          location: booking.location || 'Location not available',
+          images: ['https://images.pexels.com/photos/1263426/pexels-photo-1263426.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2']
         },
         date: booking.date,
         startTime: booking.start_time,
         endTime: booking.end_time,
-        totalAmount: parseFloat(booking.total_amount),
+        totalAmount: parseFloat(booking.price),
         status: booking.status.toLowerCase()
       }));
     } catch (error: any) {
+      console.error('Error fetching bookings:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch bookings');
     }
   },
@@ -53,29 +50,25 @@ export const bookingApi = {
   getBookingById: async (id: string) => {
     try {
       const response = await api.get('/my-bookings');
-      const booking = response.data.bookings.find((b: any) => b.id.toString() === id);
+      const booking = response.data.bookings.find((b: any) => b.id === id);
       
       if (!booking) {
         throw new Error('Booking not found');
       }
       
       return {
-        id: booking.id.toString(),
+        id: booking.id || Math.random().toString(),
         venue: {
-          id: booking.facility.id.toString(),
-          slug: booking.facility.slug,
-          name: booking.facility.name,
-          location: booking.facility.address,
-          images: booking.facility.images?.split(',') || [],
-          coordinates: {
-            latitude: parseFloat(booking.facility.latitude || '0'),
-            longitude: parseFloat(booking.facility.longitude || '0')
-          }
+          id: booking.id || Math.random().toString(),
+          name: booking.facility,
+          type: booking.court,
+          location: booking.location || 'Location not available',
+          images: ['https://images.pexels.com/photos/1263426/pexels-photo-1263426.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2']
         },
         date: booking.date,
         startTime: booking.start_time,
         endTime: booking.end_time,
-        totalAmount: parseFloat(booking.total_amount),
+        totalAmount: parseFloat(booking.price),
         status: booking.status.toLowerCase()
       };
     } catch (error: any) {
@@ -85,18 +78,8 @@ export const bookingApi = {
   
   createBooking: async (bookingData: any) => {
     try {
-      const token = await AsyncStorage.getItem('token');
-      if (!token) {
-        throw new Error('Authentication required');
-      }
-
-      const response = await api.post('/booking', bookingData, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      
-      return response.data.booking;
+      const response = await api.post('/booking', bookingData);
+      return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to create booking');
     }

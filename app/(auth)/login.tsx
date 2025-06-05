@@ -89,80 +89,80 @@ export default function LoginScreen() {
   //     setLoading(false);
   //   }
   // };
-// const handleVerifyOTP = async () => {
-//   const isMobileValid = mobile !== '' && /^[0-9]{10}$/.test(mobile);
-//   const isEmailValid = email !== '' && /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
-//   const isOtpValid = otp !== '' && /^[0-9]{6}$/.test(otp);
+  // const handleVerifyOTP = async () => {
+  //   const isMobileValid = mobile !== '' && /^[0-9]{10}$/.test(mobile);
+  //   const isEmailValid = email !== '' && /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
+  //   const isOtpValid = otp !== '' && /^[0-9]{6}$/.test(otp);
 
-//   if (isMobileValid || isEmailValid) {
-//     if (isOtpValid) {
-//       setLoading(true);
-//       setError(null);
+  //   if (isMobileValid || isEmailValid) {
+  //     if (isOtpValid) {
+  //       setLoading(true);
+  //       setError(null);
 
-//       try {
-//         if (isMobileValid) {
-//           await verifyOTP.mutateAsync({
-//             mobile,
-//             otp,
-//             url: '/verify-otp',
-//           });
-//         } else {
-//           await verifyEmailOTP.mutateAsync({
-//             email,
-//             otp,
-//             url: '/verify-otp-via-email',
-//           });
-//         }
+  //       try {
+  //         if (isMobileValid) {
+  //           await verifyOTP.mutateAsync({
+  //             mobile,
+  //             otp,
+  //             url: '/verify-otp',
+  //           });
+  //         } else {
+  //           await verifyEmailOTP.mutateAsync({
+  //             email,
+  //             otp,
+  //             url: '/verify-otp-via-email',
+  //           });
+  //         }
 
-//         await login(email || mobile, otp); // Assuming login handles both internally
-//         router.replace('/(tabs)');
-//       } catch (err: any) {
-//         setError(err?.response?.data?.message || err.message || 'OTP verification failed');
-//       } finally {
-//         setLoading(false);
-//       }
-//     } else {
-//       setError('Invalid OTP.');
-//     }
-//   } else {
-//     setError('Invalid Mobile No. or Email.');
-//   }
-// };
-const handleVerifyOTP = async () => {
-  const isEmail = showInput === 'email';
-  const isMobile = showInput === 'phone';
+  //         await login(email || mobile, otp); // Assuming login handles both internally
+  //         router.replace('/(tabs)');
+  //       } catch (err: any) {
+  //         setError(err?.response?.data?.message || err.message || 'OTP verification failed');
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     } else {
+  //       setError('Invalid OTP.');
+  //     }
+  //   } else {
+  //     setError('Invalid Mobile No. or Email.');
+  //   }
+  // };
+  const handleVerifyOTP = async () => {
+    const isEmail = showInput === 'email';
+    const isMobile = showInput === 'phone';
 
-  const isMobileValid = isMobile && /^[0-9]{10}$/.test(identifier);
-  const isEmailValid = isEmail && /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(identifier);
-  const isOtpValid = otp !== '' && /^[0-9]{6}$/.test(otp);
+    const isMobileValid = isMobile && /^[0-9]{10}$/.test(identifier);
+    const isEmailValid = isEmail && /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(identifier);
+    const isOtpValid = otp !== '' && /^[0-9]{6}$/.test(otp);
 
-  if (isMobileValid || isEmailValid) {
-    if (isOtpValid) {
-      setLoading(true);
-      setError(null);
+    if (isMobileValid || isEmailValid) {
+      if (isOtpValid) {
+        setLoading(true);
+        setError(null);
 
-      try {
-        if (isMobileValid) {
-          await authApi.verifyOTP(identifier, otp);
-        } else {
-          console.log('Verifying email OTP:', { identifier, otp });
-          await authApi.verifyOTP(identifier, otp);
+        try {
+          if (isMobileValid) {
+            await authApi.verifyOTP(identifier, otp);
+          } else {
+            console.log('Verifying email OTP:', { identifier, otp });
+            await authApi.verifyOTP(identifier, otp);
+          }
+
+          // await login(identifier, otp); // Handles both mobile/email
+          router.replace('/(tabs)');
+        } catch (err: any) {
+          setError(err?.response?.data?.message || err.message || 'OTP verification failed');
+        } finally {
+          setLoading(false);
         }
-
-        // await login(identifier, otp); // Handles both mobile/email
-        router.replace('/(tabs)');
-      } catch (err: any) {
-        setError(err?.response?.data?.message || err.message || 'OTP verification failed');
-      } finally {
-        setLoading(false);
+      } else {
+        setError('Invalid OTP.');
       }
     } else {
-      setError('Invalid OTP.');
+      setError('Invalid Mobile No. or Email.');
     }
-  } else {
-    setError('Invalid Mobile No. or Email.');
-  }
-};
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -173,9 +173,10 @@ const handleVerifyOTP = async () => {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.logoContainer}>
             <Image
-              source={{ uri: 'https://images.pexels.com/photos/3775042/pexels-photo-3775042.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }}
+              source={require('../../assets/images/BookVenue_Logo.png')} // adjust the path as needed
               style={styles.logo}
             />
+
             <Text style={styles.appName}>BookVenue</Text>
             <Text style={styles.tagline}>Find and book venues with ease</Text>
           </View>

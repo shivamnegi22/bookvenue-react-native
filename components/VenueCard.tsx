@@ -39,8 +39,7 @@ export default function VenueCard({ venue, size }: VenueCardProps) {
             <Text style={styles.locationText} numberOfLines={1}>{venue.location}</Text>
           </View>
           <View style={styles.priceContainer}>
-            <DollarSign size={14} color="#2563EB" />
-            <Text style={styles.priceText}>${venue.pricePerHour}/hour</Text>
+            <Text style={styles.priceText}>₹{venue.pricePerHour}/hour</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -70,8 +69,7 @@ export default function VenueCard({ venue, size }: VenueCardProps) {
             <Text style={styles.venueTypeText}>{venue.type}</Text>
           </View>
           <View style={styles.priceContainer}>
-            <DollarSign size={14} color="#2563EB" />
-            <Text style={styles.priceText}>${venue.pricePerHour}/hour</Text>
+            <Text style={styles.priceText}>₹{venue.pricePerHour}/hour</Text>
           </View>
         </View>
       </View>

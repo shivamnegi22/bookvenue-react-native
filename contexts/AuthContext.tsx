@@ -6,7 +6,11 @@ export type User = {
   id: string;
   name: string;
   email: string;
+  phone: string;
+  address: string;
   isVenueOwner: boolean;
+  createdAt: string;
+  updatedAt: string;
   profileImage?: string;
 };
 
@@ -38,9 +42,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkLoggedIn = async () => {
       try {
         const token = await AsyncStorage.getItem('token');
-        const userJson = await AsyncStorage.getItem('user');
-        if (token && userJson) {
-          setUser(JSON.parse(userJson));
+        if (token) {
+          const userData = await authApi.getProfile();
+          setUser(userData);
         }
       } catch (error) {
         console.error('Error checking logged-in status:', error);
@@ -54,9 +58,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (identifier: string, otp: string): Promise<void> => {
     try {
-      console.log('Login attempt:', { identifier, otp });
-      const userData = await authApi.verifyOTP(identifier, otp);
-      console.log('Login successful:', userData);
+      await authApi.verifyOTP(identifier, otp);
+      const userData = await authApi.getProfile();
+      setUser(userData);
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -94,7 +98,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const updatedUser = await authApi.updateProfile({ ...user, ...data });
       setUser(updatedUser);
-      await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
     } catch (error) {
       console.error('Profile update failed:', error);
       throw error;
@@ -103,9 +106,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshUser = async (): Promise<void> => {
     try {
-      const updatedUser = await authApi.getProfile();
-      setUser(updatedUser);
-      await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+      const userData = await authApi.getProfile();
+      setUser(userData);
     } catch (error) {
       console.error('Failed to refresh user:', error);
     }

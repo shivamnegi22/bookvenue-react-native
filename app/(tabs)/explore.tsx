@@ -1,39 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, useWindowDimensions, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Search, Filter, MapPin, X, FileSliders as Sliders, Calendar, DollarSign, Star } from 'lucide-react-native';
+import { Search, Filter, MapPin, X, FileSliders as Sliders, Calendar,  Star } from 'lucide-react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { venueApi } from '@/api/venueApi';
 import { Venue } from '@/types/venue';
 import VenueCard from '@/components/VenueCard';
-
-// Create a type for the map components
-type MapComponents = {
-  MapView: React.ComponentType<any> | null;
-  Marker: React.ComponentType<any> | null;
-};
-
-// Move the entire map components logic into a function
-const getMapComponents = (): MapComponents => {
-  // Return null components for web platform immediately
-  if (Platform.OS === 'web') {
-    return { MapView: null, Marker: null };
-  }
-
-  // Only try to import react-native-maps on non-web platforms
-  try {
-    // Dynamic import to prevent web bundling
-    const MapView = require('react-native-maps').default;
-    const { Marker } = require('react-native-maps');
-    return { MapView, Marker };
-  } catch (e) {
-    console.warn('Error loading react-native-maps:', e);
-    return { MapView: null, Marker: null };
-  }
-};
-
-// Get map components
-const MapComponents = getMapComponents();
+import MapView, { Marker } from 'react-native-maps';
 
 export default function ExploreScreen() {
   const { query, filter } = useLocalSearchParams<{ query?: string; filter?: string }>();
@@ -124,6 +97,10 @@ export default function ExploreScreen() {
     setMinRating(0);
     setFilteredVenues(venues);
     setShowFilters(false);
+  };
+
+  const handleMarkerPress = (venue: Venue) => {
+    router.push(`/venue/${venue.slug}`);
   };
 
   const sportTypes = ['Football', 'Cricket', 'Tennis', 'Basketball', 'Swimming', 'Badminton'];
@@ -217,7 +194,6 @@ export default function ExploreScreen() {
             
             <View style={styles.filterSection}>
               <View style={styles.filterSectionHeader}>
-                <DollarSign size={20} color="#2563EB" />
                 <Text style={styles.filterSectionTitle}>Price Range</Text>
               </View>
               <View style={styles.priceRangeContainer}>
@@ -304,19 +280,19 @@ export default function ExploreScreen() {
                   <Text style={styles.webMapButtonText}>Switch to List View</Text>
                 </TouchableOpacity>
               </View>
-            ) : MapComponents.MapView && MapComponents.Marker ? (
+            ) : (
               <View style={styles.mapContainer}>
-                <MapComponents.MapView
+                <MapView
                   style={styles.map}
                   initialRegion={{
-                    latitude: 30.32552,
-                    longitude: 78.04662,
+                    latitude: 30.409520112380957,
+                    longitude: 77.95852843921004,
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
                   }}
                 >
                   {filteredVenues.map((venue) => (
-                    <MapComponents.Marker
+                    <Marker
                       key={venue.id}
                       coordinate={{
                         latitude: venue.coordinates.latitude,
@@ -324,20 +300,10 @@ export default function ExploreScreen() {
                       }}
                       title={venue.name}
                       description={`${venue.type} • $${venue.pricePerHour}/hr`}
-                      onPress={() => router.push(`/venue/${venue.id}`)}
+                      onPress={() => handleMarkerPress(venue)}
                     />
                   ))}
-                </MapComponents.MapView>
-              </View>
-            ) : (
-              <View style={styles.webMapFallback}>
-                <Text style={styles.webMapText}>Map view is not available</Text>
-                <TouchableOpacity 
-                  style={styles.webMapButton}
-                  onPress={() => setShowMap(false)}
-                >
-                  <Text style={styles.webMapButtonText}>Switch to List View</Text>
-                </TouchableOpacity>
+                </MapView>
               </View>
             )
           ) : (

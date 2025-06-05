@@ -17,7 +17,7 @@ export const venueApi = {
     try {
       const response = await api.get('/get-all-facility');
       const data = response.data.facility;
-
+      console.log('Fetched data:', data);
       const venues: Venue[] = data.map((facility: any) => {
         const service = facility.services?.[0];
 
@@ -32,7 +32,7 @@ export const venueApi = {
           description: facility.description || '',
           location: facility.address,
           type: service?.name || 'Other',
-          pricePerHour: parseFloat(service?.price || '0'),
+          pricePerHour: parseFloat(facility.pricePerHour || 1400 ),
           openingTime: '08:00',
           closingTime: '20:00',
           rating: 4.5,
@@ -46,7 +46,7 @@ export const venueApi = {
           }
         };
       });
-
+      console.log('Fetched venues:', venues);
       return venues;
     } catch (error) {
       console.error('Failed to fetch venues:', error);

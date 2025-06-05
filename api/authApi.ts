@@ -29,7 +29,7 @@ export const authApi = {
         ? { email: identifier }
         : { mobile: identifier };
       await api.post(endpoint, payload);
-      return
+      return;
     } catch (error: any) {
       console.error('Login Error:', error.response?.data || error);
       throw new Error(error.response?.data?.message || 'Failed to send OTP');
@@ -60,8 +60,18 @@ export const authApi = {
 
   getProfile: async () => {
     try {
-      const response = await api.get('/get-user-role');
-      return response.data.user;
+      const response = await api.get('/get-user-details');
+      const userData = response.data.user;
+      return {
+        id: userData.id.toString(),
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        address: userData.address,
+        isVenueOwner: false, // Set based on your logic
+        createdAt: userData.created_at,
+        updatedAt: userData.updated_at
+      };
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to get profile');
     }

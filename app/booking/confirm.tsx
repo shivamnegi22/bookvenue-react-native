@@ -32,7 +32,7 @@ export default function BookingConfirmScreen() {
     const fetchVenue = async () => {
       try {
         if (!venueId) return;
-        const response = await venueApi.getVenueById(venueId);
+        const response = await venueApi.getVenueBySlug(venueId);
         setVenue(response);
       } catch (error) {
         console.error('Error fetching venue:', error);

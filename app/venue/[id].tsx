@@ -47,42 +47,76 @@ export default function VenueDetailScreen() {
     fetchVenue();
   }, [id]);
   
-  useEffect(() => {
-    if (selectedDate && venue) {
-      // Generate time slots between opening and closing time
-      // In a real app, this would check against existing bookings from the backend
-      const openingHour = parseInt(venue.openingTime.split(':')[0]);
-      const closingHour = parseInt(venue.closingTime.split(':')[0]);
+  // useEffect(() => {
+  //   if (selectedDate && venue) {
+  //     // Generate time slots between opening and closing time
+  //     // In a real app, this would check against existing bookings from the backend
+  //     const openingHour = parseInt(venue.openingTime.split(':')[0]);
+  //     const closingHour = parseInt(venue.closingTime.split(':')[0]);
       
-      const slots = [];
-      for (let hour = openingHour; hour < closingHour; hour++) {
-        slots.push(`${hour.toString().padStart(2, '0')}:00`);
-      }
+  //     const slots = [];
+  //     for (let hour = openingHour; hour < closingHour; hour++) {
+  //       slots.push(`${hour.toString().padStart(2, '0')}:00`);
+  //     }
       
-      setAvailableTimeSlots(slots);
-      setSelectedTimeSlot('');
-    }
-  }, [selectedDate, venue]);
+  //     setAvailableTimeSlots(slots);
+  //     setSelectedTimeSlot('');
+  //   }
+  // }, [selectedDate, venue]);
 
-  const handleBooking = () => {
-    if (!selectedTimeSlot) {
-      // Show error - time slot not selected
-      return;
+  // const handleBooking = () => {
+  //   if (!selectedTimeSlot) {
+  //     // Show error - time slot not selected
+  //     return;
+  //   }
+    
+  //   const endTime = `${(parseInt(selectedTimeSlot.split(':')[0]) + 1).toString().padStart(2, '0')}:00`;
+    
+  //   router.push({
+  //     pathname: '/booking/confirm',
+  //     params: {
+  //       venueId: venue?.id,
+  //       date: selectedDate,
+  //       startTime: selectedTimeSlot,
+  //       endTime: endTime,
+  //       price: venue?.pricePerHour
+  //     }
+  //   });
+  // };
+  useEffect(() => {
+  if (selectedDate && venue) {
+    const openingHour = parseInt(venue.openingTime.split(':')[0]);
+    const closingHour = parseInt(venue.closingTime.split(':')[0]);
+
+    const slots = [];
+    for (let hour = openingHour; hour < closingHour; hour++) {
+      const start = `${hour.toString().padStart(2, '0')}:00`;
+      const end = `${(hour + 1).toString().padStart(2, '0')}:00`;
+      slots.push(`${start} - ${end}`);
     }
-    
-    const endTime = `${(parseInt(selectedTimeSlot.split(':')[0]) + 1).toString().padStart(2, '0')}:00`;
-    
-    router.push({
-      pathname: '/booking/confirm',
-      params: {
-        venueId: venue?.id,
-        date: selectedDate,
-        startTime: selectedTimeSlot,
-        endTime: endTime,
-        price: venue?.pricePerHour
-      }
-    });
-  };
+
+    setAvailableTimeSlots(slots);
+    setSelectedTimeSlot('');
+  }
+}, [selectedDate, venue]);
+
+const handleBooking = () => {
+  if (!selectedTimeSlot) return;
+
+  const [startTime, endTime] = selectedTimeSlot.split(' - ');
+
+  router.push({
+    pathname: '/booking/confirm',
+    params: {
+      venueId: venue?.id,
+      date: selectedDate,
+      startTime: startTime,
+      endTime: endTime,
+      price: venue?.pricePerHour
+    }
+  });
+};
+
 
   if (loading) {
     return (
@@ -155,8 +189,8 @@ export default function VenueDetailScreen() {
             </View>
             
             <View style={styles.infoItem}>
-              <DollarSign size={16} color="#2563EB" />
-              <Text style={styles.infoText}>${venue.pricePerHour}/hour</Text>
+              <Text style={{ fontSize: 16, color: "#2563EB" }}>₹</Text>
+              <Text style={styles.infoText}>{venue.pricePerHour? 1400:1400}/hour</Text>
             </View>
           </View>
           
@@ -276,7 +310,7 @@ export default function VenueDetailScreen() {
           <View style={styles.bookingFooter}>
             <View style={styles.priceContainer}>
               <Text style={styles.priceLabel}>Price</Text>
-              <Text style={styles.priceValue}>${venue.pricePerHour}</Text>
+              <Text style={styles.priceValue}>₹{venue.pricePerHour? 1400:1400}</Text>
               <Text style={styles.priceUnit}>/hour</Text>
             </View>
             
