@@ -52,10 +52,10 @@ export default function BookingsScreen() {
           </View>
           <View style={styles.bookingInfo}>
             <Text style={styles.venueName}>{item.venue.name}</Text>
-            <View style={styles.locationContainer}>
+            {/* <View style={styles.locationContainer}>
               <MapPin size={14} color="#6B7280" />
               <Text style={styles.locationText}>{item.venue.location}</Text>
-            </View>
+            </View> */}
           </View>
         </View>
         
@@ -74,7 +74,7 @@ export default function BookingsScreen() {
         <View style={styles.bookingFooter}>
           <View style={styles.priceContainer}>
             <Text style={styles.priceLabel}>Total</Text>
-            <Text style={styles.priceValue}>${item.totalAmount}</Text>
+            <Text style={styles.priceValue}>₹{item.totalAmount}</Text>
           </View>
           
           <View style={[

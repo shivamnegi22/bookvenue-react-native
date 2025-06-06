@@ -25,15 +25,24 @@ export const bookingApi = {
   getBookings: async () => {
     try {
       const response = await api.get('/my-bookings');
-      console.log('Fetched bookings:', response.data.bookings);
-      return response.data.bookings.map((booking: any) => ({
-        id: booking.id || Math.random().toString(),
+      return response.data.bookings.map((booking: any, index: number) => ({
+        id: `booking-${index}`,
         venue: {
-          id: booking.id || Math.random().toString(),
+          id: `venue-${index}`,
           name: booking.facility,
           type: booking.court,
-          location: booking.location || 'Location not available',
-          images: ['https://images.pexels.com/photos/1263426/pexels-photo-1263426.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2']
+          location: 'Location not available',
+          images: [
+            'https://images.pexels.com/photos/1263426/pexels-photo-1263426.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/3582038/pexels-photo-3582038.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/1752757/pexels-photo-1752757.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/358042/pexels-photo-358042.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+          ][index % 5],
+          coordinates: {
+            latitude: 37.78825 + (Math.random() - 0.5) * 0.01,
+            longitude: -122.4324 + (Math.random() - 0.5) * 0.01
+          }
         },
         date: booking.date,
         startTime: booking.start_time,
@@ -50,20 +59,31 @@ export const bookingApi = {
   getBookingById: async (id: string) => {
     try {
       const response = await api.get('/my-bookings');
-      const booking = response.data.bookings.find((b: any) => b.id === id);
+      const bookingIndex = parseInt(id.replace('booking-', ''));
+      const booking = response.data.bookings[bookingIndex];
       
       if (!booking) {
         throw new Error('Booking not found');
       }
       
       return {
-        id: booking.id || Math.random().toString(),
+        id: id,
         venue: {
-          id: booking.id || Math.random().toString(),
+          id: `venue-${bookingIndex}`,
           name: booking.facility,
           type: booking.court,
-          location: booking.location || 'Location not available',
-          images: ['https://images.pexels.com/photos/1263426/pexels-photo-1263426.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2']
+          location: 'Location not available',
+          images: [
+            'https://images.pexels.com/photos/1263426/pexels-photo-1263426.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/3582038/pexels-photo-3582038.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/1752757/pexels-photo-1752757.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+            'https://images.pexels.com/photos/358042/pexels-photo-358042.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
+          ][bookingIndex % 5],
+          coordinates: {
+            latitude: 37.78825 + (Math.random() - 0.5) * 0.01,
+            longitude: -122.4324 + (Math.random() - 0.5) * 0.01
+          }
         },
         date: booking.date,
         startTime: booking.start_time,

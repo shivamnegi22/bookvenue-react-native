@@ -48,8 +48,8 @@ export const authApi = {
       const response = await api.post(endpoint, payload);
       if (response.data.token) {
         await AsyncStorage.setItem('token', response.data.token);
-        if (response.config.data) {
-          await AsyncStorage.setItem('user', JSON.stringify(response.config.data));
+        if (response.data.user) {
+          await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
         }
       }     
     } catch (error: any) {
@@ -66,7 +66,7 @@ export const authApi = {
         id: userData.id.toString(),
         name: userData.name,
         email: userData.email,
-        phone: userData.phone,
+        phone: userData.contact || userData.phone,
         address: userData.address,
         isVenueOwner: false, // Set based on your logic
         createdAt: userData.created_at,
@@ -97,19 +97,17 @@ export const authApi = {
 
   updateProfile: async (userData: any) => {
     try {
-      const formData = new FormData();
-      
-      Object.keys(userData).forEach(key => {
-        formData.append(key, userData[key]);
-      });
-      
-      const response = await api.post('/profileUpdate', formData, {
+      const response = await api.post('/profileUpdate', userData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
       });
       
-      return response.data.user;
+      if (response.statusText === 'OK' || response.status === 200) {
+        return response.data.user || userData;
+      }
+      
+      throw new Error('Failed to update profile');
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to update profile');
     }

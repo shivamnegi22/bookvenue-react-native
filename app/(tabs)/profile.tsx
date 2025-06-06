@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Switch, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
-import { User, ChevronRight, CreditCard, MapPin, Bell, HelpCircle, LogOut, Edit2, Shield } from 'lucide-react-native';
-import * as ImagePicker from 'expo-image-picker';
+import { User, ChevronRight, CreditCard, MapPin, Bell, CircleHelp as HelpCircle, LogOut, CreditCard as Edit2, Shield } from 'lucide-react-native';
+import ProfileAvatar from '@/components/ProfileAvatar';
 
 export default function ProfileScreen() {
-  const { user, logout, updateUserProfile } = useAuth();
+  const { user, logout } = useAuth();
   const [notifications, setNotifications] = useState(true);
   
   const handleLogout = async () => {
@@ -16,24 +16,6 @@ export default function ProfileScreen() {
       router.replace('/login');
     } catch (error) {
       console.error('Error logging out:', error);
-    }
-  };
-  
-  const pickImage = async () => {
-    try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-      });
-
-      if (!result.canceled && result.assets[0].uri) {
-        // In a real app, we would upload the image to a server here
-        updateUserProfile({ profileImage: result.assets[0].uri });
-      }
-    } catch (error) {
-      console.error('Error picking image:', error);
     }
   };
   
@@ -90,19 +72,15 @@ export default function ProfileScreen() {
         
         <View style={styles.profileSection}>
           <View style={styles.profileImageContainer}>
-            {user?.profileImage ? (
-              <Image 
-                source={{ uri: user.profileImage }} 
-                style={styles.profileImage} 
-              />
-            ) : (
-              <View style={styles.profileImagePlaceholder}>
-                <User size={40} color="#9CA3AF" />
-              </View>
-            )}
+            <ProfileAvatar 
+              name={user?.name || 'User'} 
+              size={100}
+              backgroundColor="#2563EB"
+              textColor="#FFFFFF"
+            />
             <TouchableOpacity 
               style={styles.editImageButton}
-              onPress={pickImage}
+              onPress={() => router.push('/edit-profile')}
             >
               <Edit2 size={16} color="#FFFFFF" />
             </TouchableOpacity>
@@ -189,19 +167,6 @@ const styles = StyleSheet.create({
   profileImageContainer: {
     position: 'relative',
     marginBottom: 16,
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  profileImagePlaceholder: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#F3F4F6',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   editImageButton: {
     position: 'absolute',

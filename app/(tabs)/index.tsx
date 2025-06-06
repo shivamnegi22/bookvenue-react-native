@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, MapPin, Filter, Star, Clock } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,6 +7,7 @@ import { venueApi } from '@/api/venueApi';
 import { useRouter } from 'expo-router';
 import { Venue } from '@/types/venue';
 import VenueCard from '@/components/VenueCard';
+import ProfileAvatar from '@/components/ProfileAvatar';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function HomeScreen() {
@@ -67,18 +68,20 @@ export default function HomeScreen() {
             <Text style={styles.welcomeText}>
               Hello, {user?.name?.split(' ')[0] || 'Guest'}
             </Text>
-            <View style={styles.locationContainer}>
+            {/* <View style={styles.locationContainer}>
               <MapPin size={16} color="#6B7280" />
               <Text style={styles.locationText}>San Francisco, CA</Text>
-            </View>
+            </View> */}
           </View>
           <TouchableOpacity 
             style={styles.profileImageContainer}
             onPress={() => router.push('/profile')}
           >
-            <Image 
-              source={{ uri: user?.profileImage || 'https://images.pexels.com/photos/1680172/pexels-photo-1680172.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }} 
-              style={styles.profileImage} 
+            <ProfileAvatar 
+              name={user?.name || 'User'} 
+              size={40}
+              backgroundColor="#2563EB"
+              textColor="#FFFFFF"
             />
           </TouchableOpacity>
         </View>
@@ -143,52 +146,37 @@ export default function HomeScreen() {
           >
             <TouchableOpacity style={styles.categoryItem}>
               <View style={[styles.categoryIcon, { backgroundColor: '#EFF6FF' }]}>
-                <Image 
-                  source={{ uri: 'https://images.pexels.com/photos/3582038/pexels-photo-3582038.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }} 
-                  style={styles.categoryImage} 
-                />
+                <Text style={styles.categoryEmoji}>⚽</Text>
               </View>
               <Text style={styles.categoryName}>Football</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.categoryItem}>
               <View style={[styles.categoryIcon, { backgroundColor: '#ECFDF5' }]}>
-                <Image 
-                  source={{ uri: 'https://images.pexels.com/photos/2277981/pexels-photo-2277981.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }} 
-                  style={styles.categoryImage} 
-                />
+                <Text style={styles.categoryEmoji}>🎾</Text>
               </View>
               <Text style={styles.categoryName}>Tennis</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.categoryItem}>
               <View style={[styles.categoryIcon, { backgroundColor: '#FEF3F2' }]}>
-                <Image 
-                  source={{ uri: 'https://images.pexels.com/photos/1752757/pexels-photo-1752757.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }} 
-                  style={styles.categoryImage} 
-                />
+                <Text style={styles.categoryEmoji}>🏏</Text>
               </View>
               <Text style={styles.categoryName}>Cricket</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.categoryItem}>
               <View style={[styles.categoryIcon, { backgroundColor: '#F5F3FF' }]}>
-                <Image 
-                  source={{ uri: 'https://images.pexels.com/photos/358042/pexels-photo-358042.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }} 
-                  style={styles.categoryImage} 
-                />
+                <Text style={styles.categoryEmoji}>🏀</Text>
               </View>
               <Text style={styles.categoryName}>Basketball</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.categoryItem}>
               <View style={[styles.categoryIcon, { backgroundColor: '#FFEDD5' }]}>
-                <Image 
-                  source={{ uri: 'https://images.pexels.com/photos/4429452/pexels-photo-4429452.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' }} 
-                  style={styles.categoryImage} 
-                />
+                <Text style={styles.categoryEmoji}>🏊</Text>
               </View>
-              <Text style={styles.categoryName}>More</Text>
+              <Text style={styles.categoryName}>Swimming</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
@@ -243,10 +231,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     overflow: 'hidden',
-  },
-  profileImage: {
-    width: '100%',
-    height: '100%',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -357,11 +341,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
-    overflow: 'hidden',
   },
-  categoryImage: {
-    width: '100%',
-    height: '100%',
+  categoryEmoji: {
+    fontSize: 24,
   },
   categoryName: {
     fontFamily: 'Inter-Medium',
