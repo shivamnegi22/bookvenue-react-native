@@ -15,4 +15,25 @@ export type Venue = {
     latitude: number;
     longitude: number;
   };
+  services?: VenueService[];
+};
+
+export type VenueService = {
+  id: number;
+  facility_id: number;
+  service_id: number;
+  name: string;
+  images: string;
+  courts: VenueCourt[];
+};
+
+export type VenueCourt = {
+  id: number;
+  facility_service_id: number;
+  court_name: string;
+  start_time: string;
+  end_time: string;
+  slot_price: string;
+  duration: string;
+  breaks: string;
 };

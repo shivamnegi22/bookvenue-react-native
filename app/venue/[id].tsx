@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, ActivityIn
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { venueApi } from '@/api/venueApi';
-import { Venue } from '@/types/venue';
+import { Venue, VenueService, VenueCourt } from '@/types/venue';
 import { ArrowLeft, Star, MapPin, Clock, DollarSign, Calendar, ArrowRight, ChevronRight } from 'lucide-react-native';
 import MapView, { Marker } from 'react-native-maps';
 
@@ -15,6 +15,8 @@ export default function VenueDetailScreen() {
   const [venue, setVenue] = useState<Venue | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedService, setSelectedService] = useState<VenueService | null>(null);
+  const [selectedCourt, setSelectedCourt] = useState<VenueCourt | null>(null);
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
   
@@ -36,7 +38,15 @@ export default function VenueDetailScreen() {
         if (!id) return;
         const response = await venueApi.getVenueBySlug(id);
         setVenue(response);
+        
+        // Set initial selections
         setSelectedDate(nextDays[0].fullDate);
+        if (response.services && response.services.length > 0) {
+          setSelectedService(response.services[0]);
+          if (response.services[0].courts && response.services[0].courts.length > 0) {
+            setSelectedCourt(response.services[0].courts[0]);
+          }
+        }
       } catch (error) {
         console.error('Error fetching venue:', error);
       } finally {
@@ -47,76 +57,67 @@ export default function VenueDetailScreen() {
     fetchVenue();
   }, [id]);
   
-  // useEffect(() => {
-  //   if (selectedDate && venue) {
-  //     // Generate time slots between opening and closing time
-  //     // In a real app, this would check against existing bookings from the backend
-  //     const openingHour = parseInt(venue.openingTime.split(':')[0]);
-  //     const closingHour = parseInt(venue.closingTime.split(':')[0]);
-      
-  //     const slots = [];
-  //     for (let hour = openingHour; hour < closingHour; hour++) {
-  //       slots.push(`${hour.toString().padStart(2, '0')}:00`);
-  //     }
-      
-  //     setAvailableTimeSlots(slots);
-  //     setSelectedTimeSlot('');
-  //   }
-  // }, [selectedDate, venue]);
-
-  // const handleBooking = () => {
-  //   if (!selectedTimeSlot) {
-  //     // Show error - time slot not selected
-  //     return;
-  //   }
-    
-  //   const endTime = `${(parseInt(selectedTimeSlot.split(':')[0]) + 1).toString().padStart(2, '0')}:00`;
-    
-  //   router.push({
-  //     pathname: '/booking/confirm',
-  //     params: {
-  //       venueId: venue?.id,
-  //       date: selectedDate,
-  //       startTime: selectedTimeSlot,
-  //       endTime: endTime,
-  //       price: venue?.pricePerHour
-  //     }
-  //   });
-  // };
   useEffect(() => {
-  if (selectedDate && venue) {
-    const openingHour = parseInt(venue.openingTime.split(':')[0]);
-    const closingHour = parseInt(venue.closingTime.split(':')[0]);
-
-    const slots = [];
-    for (let hour = openingHour; hour < closingHour; hour++) {
-      const start = `${hour.toString().padStart(2, '0')}:00`;
-      const end = `${(hour + 1).toString().padStart(2, '0')}:00`;
-      slots.push(`${start} - ${end}`);
+    if (selectedDate && selectedCourt) {
+      // Generate time slots based on selected court
+      const openingHour = parseInt(selectedCourt.start_time.split(':')[0]);
+      const closingHour = parseInt(selectedCourt.end_time.split(':')[0]);
+      const duration = parseInt(selectedCourt.duration || '60');
+      
+      const slots = [];
+      for (let hour = openingHour; hour < closingHour; hour += (duration / 60)) {
+        const startHour = Math.floor(hour);
+        const startMinute = (hour % 1) * 60;
+        const timeString = `${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
+        slots.push(timeString);
+      }
+      
+      setAvailableTimeSlots(slots);
+      setSelectedTimeSlot('');
     }
+  }, [selectedDate, selectedCourt]);
 
-    setAvailableTimeSlots(slots);
+  const handleServiceChange = (service: VenueService) => {
+    setSelectedService(service);
+    if (service.courts && service.courts.length > 0) {
+      setSelectedCourt(service.courts[0]);
+    }
     setSelectedTimeSlot('');
-  }
-}, [selectedDate, venue]);
+  };
 
-const handleBooking = () => {
-  if (!selectedTimeSlot) return;
+  const handleCourtChange = (court: VenueCourt) => {
+    setSelectedCourt(court);
+    setSelectedTimeSlot('');
+  };
 
-  const [startTime, endTime] = selectedTimeSlot.split(' - ');
-
-  router.push({
-    pathname: '/booking/confirm',
-    params: {
-      venueId: venue?.id,
-      date: selectedDate,
-      startTime: startTime,
-      endTime: endTime,
-      price: venue?.pricePerHour
+  const handleBooking = () => {
+    if (!selectedTimeSlot || !selectedCourt) {
+      return;
     }
-  });
-};
-
+    
+    const duration = parseInt(selectedCourt.duration || '60');
+    const startHour = parseInt(selectedTimeSlot.split(':')[0]);
+    const startMinute = parseInt(selectedTimeSlot.split(':')[1]);
+    const endHour = startHour + Math.floor(duration / 60);
+    const endMinute = startMinute + (duration % 60);
+    
+    const endTime = `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
+    
+    router.push({
+      pathname: '/booking/confirm',
+      params: {
+        venueId: venue?.slug,
+        serviceId: selectedService?.id,
+        courtId: selectedCourt?.id,
+        date: selectedDate,
+        startTime: selectedTimeSlot,
+        endTime: endTime,
+        price: selectedCourt?.slot_price,
+        courtName: selectedCourt?.court_name,
+        serviceName: selectedService?.name
+      }
+    });
+  };
 
   if (loading) {
     return (
@@ -185,12 +186,16 @@ const handleBooking = () => {
           <View style={styles.infoRow}>
             <View style={styles.infoItem}>
               <Clock size={16} color="#2563EB" />
-              <Text style={styles.infoText}>{venue.openingTime} - {venue.closingTime}</Text>
+              <Text style={styles.infoText}>
+                {selectedCourt ? `${selectedCourt.start_time} - ${selectedCourt.end_time}` : `${venue.openingTime} - ${venue.closingTime}`}
+              </Text>
             </View>
             
             <View style={styles.infoItem}>
-              <Text style={{ fontSize: 16, color: "#2563EB" }}>₹</Text>
-              <Text style={styles.infoText}>{venue.pricePerHour? 1400:1400}/hour</Text>
+              <DollarSign size={16} color="#2563EB" />
+              <Text style={styles.infoText}>
+                ₹{selectedCourt ? selectedCourt.slot_price : venue.pricePerHour}/hour
+              </Text>
             </View>
           </View>
           
@@ -215,23 +220,29 @@ const handleBooking = () => {
           
           <Text style={styles.sectionTitle}>Location</Text>
           <View style={styles.mapContainer}>
-            <MapView
-              style={styles.map}
-              initialRegion={{
-                latitude: venue.coordinates.latitude,
-                longitude: venue.coordinates.longitude,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              }}
-            >
-              <Marker
-                coordinate={{
+            {Platform.OS === 'web' ? (
+              <View style={styles.webMapFallback}>
+                <Text style={styles.webMapText}>Map view is not available on web</Text>
+              </View>
+            ) : (
+              <MapView
+                style={styles.map}
+                initialRegion={{
                   latitude: venue.coordinates.latitude,
-                  longitude: venue.coordinates.longitude
+                  longitude: venue.coordinates.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
                 }}
-                title={venue.name}
-              />
-            </MapView>
+              >
+                <Marker
+                  coordinate={{
+                    latitude: venue.coordinates.latitude,
+                    longitude: venue.coordinates.longitude
+                  }}
+                  title={venue.name}
+                />
+              </MapView>
+            )}
             
             <TouchableOpacity style={styles.viewOnMapButton}>
               <Text style={styles.viewOnMapText}>View on Map</Text>
@@ -242,6 +253,74 @@ const handleBooking = () => {
           <View style={styles.separator} />
           
           <Text style={styles.sectionTitle}>Booking</Text>
+          
+          {/* Service Selection */}
+          {venue.services && venue.services.length > 1 && (
+            <>
+              <Text style={styles.selectionTitle}>Select Sport</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={styles.serviceContainer}>
+                  {venue.services.map((service) => (
+                    <TouchableOpacity 
+                      key={service.id}
+                      style={[
+                        styles.serviceItem,
+                        selectedService?.id === service.id && styles.selectedServiceItem
+                      ]}
+                      onPress={() => handleServiceChange(service)}
+                    >
+                      <Text 
+                        style={[
+                          styles.serviceText,
+                          selectedService?.id === service.id && styles.selectedServiceText
+                        ]}
+                      >
+                        {service.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            </>
+          )}
+
+          {/* Court Selection */}
+          {selectedService && selectedService.courts && selectedService.courts.length > 1 && (
+            <>
+              <Text style={styles.selectionTitle}>Select Court</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={styles.courtContainer}>
+                  {selectedService.courts.map((court) => (
+                    <TouchableOpacity 
+                      key={court.id}
+                      style={[
+                        styles.courtItem,
+                        selectedCourt?.id === court.id && styles.selectedCourtItem
+                      ]}
+                      onPress={() => handleCourtChange(court)}
+                    >
+                      <Text 
+                        style={[
+                          styles.courtText,
+                          selectedCourt?.id === court.id && styles.selectedCourtText
+                        ]}
+                      >
+                        {court.court_name}
+                      </Text>
+                      <Text 
+                        style={[
+                          styles.courtPrice,
+                          selectedCourt?.id === court.id && styles.selectedCourtPrice
+                        ]}
+                      >
+                        ₹{court.slot_price}/hr
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            </>
+          )}
           
           <Text style={styles.dateSelectionTitle}>Select Date</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -310,7 +389,9 @@ const handleBooking = () => {
           <View style={styles.bookingFooter}>
             <View style={styles.priceContainer}>
               <Text style={styles.priceLabel}>Price</Text>
-              <Text style={styles.priceValue}>₹{venue.pricePerHour? 1400:1400}</Text>
+              <Text style={styles.priceValue}>
+                ₹{selectedCourt ? selectedCourt.slot_price : venue.pricePerHour}
+              </Text>
               <Text style={styles.priceUnit}>/hour</Text>
             </View>
             
@@ -451,6 +532,13 @@ const styles = StyleSheet.create({
     color: '#1F2937',
     marginBottom: 12,
   },
+  selectionTitle: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 16,
+    color: '#1F2937',
+    marginBottom: 12,
+    marginTop: 8,
+  },
   descriptionText: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
@@ -489,6 +577,17 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  webMapFallback: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+  },
+  webMapText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 16,
+    color: '#6B7280',
+  },
   viewOnMapButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -500,6 +599,66 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#2563EB',
     marginRight: 4,
+  },
+  serviceContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  serviceItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    marginRight: 12,
+  },
+  selectedServiceItem: {
+    backgroundColor: '#2563EB',
+    borderColor: '#2563EB',
+  },
+  serviceText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: '#4B5563',
+  },
+  selectedServiceText: {
+    color: '#FFFFFF',
+  },
+  courtContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  courtItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    marginRight: 12,
+    alignItems: 'center',
+  },
+  selectedCourtItem: {
+    backgroundColor: '#2563EB',
+    borderColor: '#2563EB',
+  },
+  courtText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: '#4B5563',
+    marginBottom: 2,
+  },
+  selectedCourtText: {
+    color: '#FFFFFF',
+  },
+  courtPrice: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  selectedCourtPrice: {
+    color: '#FFFFFF',
   },
   dateSelectionTitle: {
     fontFamily: 'Inter-Medium',

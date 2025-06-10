@@ -1,26 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { venueApi } from '@/api/venueApi';
 import { bookingApi } from '@/api/bookingApi';
 import { Venue } from '@/types/venue';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowLeft, MapPin, Calendar, Clock, DollarSign, CreditCard, CheckCircle2 } from 'lucide-react-native';
-import { useStripe } from '@stripe/stripe-react-native';
+import { ArrowLeft, MapPin, Calendar, Clock, DollarSign, CreditCard, CircleCheck as CheckCircle2 } from 'lucide-react-native';
+
+// Razorpay types
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 export default function BookingConfirmScreen() {
-  const { venueId, date, startTime, endTime, price } = useLocalSearchParams<{
+  const { 
+    venueId, 
+    serviceId, 
+    courtId, 
+    date, 
+    startTime, 
+    endTime, 
+    price, 
+    courtName, 
+    serviceName 
+  } = useLocalSearchParams<{
     venueId: string;
+    serviceId: string;
+    courtId: string;
     date: string;
     startTime: string;
     endTime: string;
     price: string;
+    courtName: string;
+    serviceName: string;
   }>();
   
   const router = useRouter();
   const { user } = useAuth();
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
   
   const [venue, setVenue] = useState<Venue | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +62,20 @@ export default function BookingConfirmScreen() {
 
     fetchVenue();
   }, [venueId]);
+
+  // Load Razorpay script for web
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      document.body.appendChild(script);
+      
+      return () => {
+        document.body.removeChild(script);
+      };
+    }
+  }, []);
   
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
@@ -63,50 +96,68 @@ export default function BookingConfirmScreen() {
   
   const totalAmount = calculateTotalAmount();
   
-  const handlePayment = async () => {
+  const handleRazorpayPayment = () => {
+    if (Platform.OS !== 'web') {
+      // For mobile platforms, you would use react-native-razorpay
+      // For now, we'll simulate the payment
+      handlePaymentSuccess('mobile_payment_id');
+      return;
+    }
+
+    const options = {
+      key: 'rzp_live_qyWsOEPEllNahd', // Replace with your Razorpay key
+      amount: totalAmount * 100, // Amount in paise
+      currency: 'INR',
+      name: 'BookVenue',
+      description: `Booking for ${venue?.name} - ${courtName}`,
+      image: 'https://images.pexels.com/photos/3775042/pexels-photo-3775042.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2',
+      order_id: '', // You would get this from your backend
+      handler: function (response: any) {
+        handlePaymentSuccess(response.razorpay_payment_id);
+      },
+      prefill: {
+        name: user?.name || '',
+        email: user?.email || '',
+        contact: user?.phone || ''
+      },
+      notes: {
+        venue_id: venueId,
+        service_id: serviceId,
+        court_id: courtId,
+        date: date,
+        start_time: startTime,
+        end_time: endTime
+      },
+      theme: {
+        color: '#2563EB'
+      },
+      modal: {
+        ondismiss: function() {
+          setPaymentLoading(false);
+        }
+      }
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+  const handlePaymentSuccess = async (paymentId: string) => {
     try {
       setPaymentLoading(true);
       setError(null);
       
-      // In a real app, this would initiate a payment flow with Stripe
-      // For demo purposes, we'll simulate a successful payment
-      
-      // Initialize the Payment Sheet
-      // const { paymentIntent, ephemeralKey, customer } = await fetchPaymentSheetParams();
-      
-      // const { error: initError } = await initPaymentSheet({
-      //   merchantDisplayName: 'BookVenue',
-      //   customerId: customer,
-      //   customerEphemeralKeySecret: ephemeralKey,
-      //   paymentIntentClientSecret: paymentIntent,
-      //   allowsDelayedPaymentMethods: false,
-      // });
-      
-      // if (initError) {
-      //   setError(initError.message);
-      //   return;
-      // }
-      
-      // Present the Payment Sheet
-      // const { error: presentError } = await presentPaymentSheet();
-      
-      // if (presentError) {
-      //   setError(presentError.message);
-      //   return;
-      // }
-      
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Create booking
+      // Create booking with payment details
       const bookingData = {
-        venueId,
-        date,
-        startTime,
-        endTime,
-        totalAmount,
-        userId: user?.id || '',
-        status: 'confirmed'
+        facility_id: venueId,
+        service_id: serviceId,
+        court_id: courtId,
+        date: date,
+        start_time: startTime,
+        end_time: endTime,
+        price: totalAmount.toString(),
+        payment_id: paymentId,
+        payment_method: 'razorpay'
       };
       
       await bookingApi.createBooking(bookingData);
@@ -118,8 +169,22 @@ export default function BookingConfirmScreen() {
       }, 2000);
       
     } catch (error: any) {
-      setError(error.message || 'Payment failed. Please try again.');
+      setError(error.message || 'Booking failed. Please try again.');
     } finally {
+      setPaymentLoading(false);
+    }
+  };
+
+  const handlePayment = async () => {
+    try {
+      setPaymentLoading(true);
+      setError(null);
+      
+      // Initialize Razorpay payment
+      handleRazorpayPayment();
+      
+    } catch (error: any) {
+      setError(error.message || 'Payment failed. Please try again.');
       setPaymentLoading(false);
     }
   };
@@ -192,6 +257,7 @@ export default function BookingConfirmScreen() {
                 <MapPin size={14} color="#6B7280" />
                 <Text style={styles.locationText} numberOfLines={1}>{venue.location}</Text>
               </View>
+              <Text style={styles.serviceInfo}>{serviceName} - {courtName}</Text>
             </View>
           </View>
           
@@ -216,7 +282,7 @@ export default function BookingConfirmScreen() {
               <DollarSign size={20} color="#2563EB" />
               <View style={styles.detailTextContainer}>
                 <Text style={styles.detailLabel}>Price per hour</Text>
-                <Text style={styles.detailValue}>${price}</Text>
+                <Text style={styles.detailValue}>₹{price}</Text>
               </View>
             </View>
           </View>
@@ -227,19 +293,19 @@ export default function BookingConfirmScreen() {
           
           <View style={styles.summaryItem}>
             <Text style={styles.summaryItemLabel}>Venue charges</Text>
-            <Text style={styles.summaryItemValue}>${totalAmount.toFixed(2)}</Text>
+            <Text style={styles.summaryItemValue}>₹{totalAmount.toFixed(2)}</Text>
           </View>
           
           <View style={styles.summaryItem}>
             <Text style={styles.summaryItemLabel}>Service fee</Text>
-            <Text style={styles.summaryItemValue}>$0.00</Text>
+            <Text style={styles.summaryItemValue}>₹0.00</Text>
           </View>
           
           <View style={styles.separator} />
           
           <View style={styles.totalItem}>
             <Text style={styles.totalLabel}>Total Amount</Text>
-            <Text style={styles.totalValue}>${totalAmount.toFixed(2)}</Text>
+            <Text style={styles.totalValue}>₹{totalAmount.toFixed(2)}</Text>
           </View>
         </View>
         
@@ -248,7 +314,7 @@ export default function BookingConfirmScreen() {
           
           <TouchableOpacity style={styles.paymentMethodItem}>
             <CreditCard size={20} color="#2563EB" />
-            <Text style={styles.paymentMethodText}>Credit/Debit Card</Text>
+            <Text style={styles.paymentMethodText}>Razorpay (UPI, Cards, Wallets)</Text>
           </TouchableOpacity>
         </View>
         
@@ -268,7 +334,7 @@ export default function BookingConfirmScreen() {
           {paymentLoading ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text style={styles.payButtonText}>Pay ${totalAmount.toFixed(2)}</Text>
+            <Text style={styles.payButtonText}>Pay ₹{totalAmount.toFixed(2)}</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -390,17 +456,23 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
     fontSize: 16,
     color: '#1F2937',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   locationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 4,
   },
   locationText: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
     color: '#6B7280',
     marginLeft: 6,
+  },
+  serviceInfo: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: '#2563EB',
   },
   detailsContainer: {
     marginTop: 8,

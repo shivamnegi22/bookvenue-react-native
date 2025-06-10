@@ -4,6 +4,8 @@ export type Booking = {
     id: string;
     name: string;
     location: string;
+    type?: string;
+    slug?: string;
     images: string[];
     coordinates: {
       latitude: number;
