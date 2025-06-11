@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Venue } from '@/types/venue';
 
-const API_URL = 'http://admin.bookvenue.app/api';
+const API_URL = 'https://admin.bookvenue.app/api';
 
 // Create axios instance
 const api = axios.create({
@@ -22,8 +22,9 @@ export const venueApi = {
         const service = facility.services?.[0];
         const court = service?.courts?.[0];
 
+
         const images = service?.images
-          ? JSON.parse(service.images).map((img: string) => `http://admin.bookvenue.app/${img.replace(/\\/g, '/')}`)
+          ? JSON.parse(service.images).map((img: string) => `https://admin.bookvenue.app/${img.replace(/\\/g, '/')}`)
           : [];
 
         return {
@@ -33,11 +34,11 @@ export const venueApi = {
           description: facility.description || '',
           location: facility.address,
           type: service?.name || 'Other',
-          pricePerHour: parseFloat(court?.slot_price || '0'),
-          openingTime: court?.start_time || '08:00',
-          closingTime: court?.end_time || '20:00',
+          pricePerHour: parseFloat(court?.slot_price || '100'),
+          openingTime: court?.start_time || '09:00',
+          closingTime: court?.end_time || '10:00',
           rating: 4.5,
-          amenities: [],
+          amenities: ['Parking', 'Changing Rooms', 'Lighting'],
           images: images.length > 0 ? images : [
             'https://images.pexels.com/photos/1263426/pexels-photo-1263426.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'
           ],
@@ -48,7 +49,7 @@ export const venueApi = {
           services: facility.services || []
         };
       });
-      console.log('Fetched venues:', venues);
+      
       return venues;
     } catch (error) {
       console.error('Failed to fetch venues:', error);
@@ -60,11 +61,23 @@ export const venueApi = {
     try {
       const response = await api.get(`/get-facility-by-slug/${slug}`);
       const facility = response.data.facility;
-      const service = facility.services?.[0];
-      const court = service?.courts?.[0];
 
-      const images = service?.images
-        ? JSON.parse(service.images).map((img: string) => `http://admin.bookvenue.app/${img.replace(/\\/g, '/')}`)
+      // Process services with proper image URLs
+      const processedServices = facility.services?.map((service: any) => ({
+        ...service,
+        courts: service.court?.map((court: any) => ({
+          ...court,
+          slot_price: court.slot_price,
+          start_time: court.start_time,
+          end_time: court.end_time,
+          duration: court.duration || '60'
+        }))
+      })) || [];
+
+      // Get images from the first service or use default
+      const firstService = processedServices[0];
+      const images = firstService?.images
+        ? JSON.parse(firstService.images).map((img: string) => `https://admin.bookvenue.app/${img.replace(/\\/g, '/')}`)
         : [];
 
       return {
@@ -73,10 +86,10 @@ export const venueApi = {
         name: facility.official_name,
         description: facility.description || 'No description available',
         location: facility.address,
-        type: service?.name || 'Other',
-        pricePerHour: parseFloat(court?.slot_price || '0'),
-        openingTime: court?.start_time || '08:00',
-        closingTime: court?.end_time || '20:00',
+        type: firstService?.name || 'Other',
+        pricePerHour: parseFloat(firstService?.courts?.[0]?.slot_price || '0'),
+        openingTime: firstService?.courts?.[0]?.start_time || '09:00',
+        closingTime: firstService?.courts?.[0]?.end_time || '20:00',
         rating: 4.5,
         amenities: ['Parking', 'Changing Rooms', 'Lighting'],
         images: images.length > 0 ? images : [
@@ -86,8 +99,9 @@ export const venueApi = {
           latitude: parseFloat(facility.lat || '0'),
           longitude: parseFloat(facility.lng || '0')
         },
-        services: facility.services || []
+        services: processedServices
       };
+      console.log('Venue fetched successfully:', facility);
     } catch (error) {
       console.error('Error fetching venue by slug:', error);
       throw new Error('Venue not found');

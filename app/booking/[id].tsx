@@ -20,7 +20,16 @@ export default function BookingDetailScreen() {
       try {
         if (!id) return;
         const response = await bookingApi.getBookingById(id);
-        setBooking(response);
+        // Ensure venue.images is always an array
+        setBooking({
+          ...response,
+          venue: {
+            ...response.venue,
+            images: Array.isArray(response.venue.images)
+              ? response.venue.images
+              : [response.venue.images],
+          },
+        });
       } catch (error) {
         console.error('Error fetching booking:', error);
       } finally {
