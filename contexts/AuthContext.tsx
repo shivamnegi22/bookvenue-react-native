@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkLoggedIn = async () => {
       try {
         const token = await AsyncStorage.getItem('token');
-        console.log('Checking logged-in status, token:', token);
+        // console.log('Checking logged-in status, token:', token);
         if (token) {
           const userData = await authApi.getProfile();
           setUser(userData);

@@ -1,34 +1,1019 @@
-{
-    "court": [
-        {
-            "breaks": "[{\"start_time\":null,\"end_time\":null},{\"start_time\":null,\"end_time\":null},{\"start_time\":null,\"end_time\":null},{\"start_time\":null,\"end_time\":null}]",
-            "court_name": "Cricket & Football Turf",
-            "created_at": "2025-05-28T08:36:48.000000Z",
-            "created_by": 1,
-            "deleted_at": null,
-            "description": null,
-            "duration": "60",
-            "end_time": "23:30",
-            "facility_service_id": 92,
-            "id": 78,
-            "slot_price": "1400",
-            "start_time": "08:00",
-            "status": 1,
-            "updated_at": "2025-06-02T06:01:47.000000Z"
+[
+    {
+        "date": "2025-05-31",
+        "endTime": null,
+        "id": "booking-0",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 2700,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-0",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "JP High Performance Sports Academy",
+            "slug": "venue-0",
+            "type": "7v7 Turf 1"
         }
-    ],
-    "created_at": "2025-05-28T08:36:48.000000Z",
-    "created_by": 1,
-    "deleted_at": null,
-    "description": null,
-    "facility_id": 72,
-    "featured_image": "storage/facility/ebM7t5sV3MdnHKfICjhygZGHNCatwBr88rZ5aBL9.webp",
-    "icon": "storage/facility/3cffeA0SfoEurrlQe2a6BOoPqeeJV5HbOptz4H49.png",
-    "id": 92,
-    "images": "[\"storage\\/facility\\/rNxmakmn9vZQ2PIfSRYzQSv7kfz5T8q7wEZUjZxp.jpg\",\"storage\\/facility\\/CojfifYkYRqvDsJVvawSl9QlMwuvXjORr3mJRJib.jpg\",\"storage\\/facility\\/1A6eT40iegYCHZSaFbUNfazmR3spy3NFAsEicqrH.jpg\",\"storage\\/facility\\/Sf6GChyG2IoEqFJM7Z5tO8ep7AqS5TNd9XAkO3NK.jpg\",\"storage\\/facility\\/DGLhWFyV790A3cr44aPkK7t0Gf4U3qo5gANHg89o.jpg\",\"storage\\/facility\\/nEsLgbu9PpzYqps0r9iIxW5iBeILegqQInojnSyo.jpg\",\"storage\\/facility\\/IvBF6ul5y8ybhWKJzn1fciYLZIbv2W91D1UCnfOH.webp\"]",
-    "name": "Cricket",
-    "service_id": 1,
-    "status": 1,
-    "upcoming_holiday": null,
-    "updated_at": "2025-05-28T08:36:48.000000Z"
-}
+    },
+    {
+        "date": "2025-05-31",
+        "endTime": null,
+        "id": "booking-1",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 2700,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-1",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "JP High Performance Sports Academy",
+            "slug": "venue-1",
+            "type": "7v7 Turf 1"
+        }
+    },
+    {
+        "date": "2025-05-31",
+        "endTime": null,
+        "id": "booking-2",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 2700,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-2",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "JP High Performance Sports Academy",
+            "slug": "venue-2",
+            "type": "7v7 Turf 1"
+        }
+    },
+    {
+        "date": "2025-05-31",
+        "endTime": null,
+        "id": "booking-3",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 2700,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-3",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "JP High Performance Sports Academy",
+            "slug": "venue-3",
+            "type": "7v7 Turf 1"
+        }
+    },
+    {
+        "date": "2025-05-31",
+        "endTime": null,
+        "id": "booking-4",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 2700,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-4",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "JP High Performance Sports Academy",
+            "slug": "venue-4",
+            "type": "7v7 Turf 1"
+        }
+    },
+    {
+        "date": "2025-06-26",
+        "endTime": null,
+        "id": "booking-5",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1400,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-5",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-5",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-12",
+        "endTime": null,
+        "id": "booking-6",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1400,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-6",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-6",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-13",
+        "endTime": null,
+        "id": "booking-7",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1400,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-7",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-7",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-13",
+        "endTime": null,
+        "id": "booking-8",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1400,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-8",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-8",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-13",
+        "endTime": null,
+        "id": "booking-9",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1400,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-9",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-9",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-13",
+        "endTime": null,
+        "id": "booking-10",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1400,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-10",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-10",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-12",
+        "endTime": null,
+        "id": "booking-11",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1400,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-11",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-11",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-12",
+        "endTime": null,
+        "id": "booking-12",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-12",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-12",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-20",
+        "endTime": null,
+        "id": "booking-13",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 3000,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-13",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-13",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-20",
+        "endTime": null,
+        "id": "booking-14",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 3000,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-14",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-14",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-20",
+        "endTime": null,
+        "id": "booking-15",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 3000,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-15",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-15",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-19",
+        "endTime": null,
+        "id": "booking-16",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 7500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-16",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-16",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-19",
+        "endTime": null,
+        "id": "booking-17",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 7500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-17",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-17",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-19",
+        "endTime": null,
+        "id": "booking-18",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 15000,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-18",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-18",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-12",
+        "endTime": null,
+        "id": "booking-19",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 4500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-19",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-19",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-10",
+        "endTime": null,
+        "id": "booking-20",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 3000,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-20",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-20",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-25",
+        "endTime": null,
+        "id": "booking-21",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 3000,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-21",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-21",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-26",
+        "endTime": null,
+        "id": "booking-22",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 7500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-22",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-22",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-10",
+        "endTime": "09:00:00",
+        "id": "booking-23",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "08:00:00",
+        "status": "pending",
+        "totalAmount": 4500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-23",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-23",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-11",
+        "endTime": "11:00:00",
+        "id": "booking-24",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "10:00:00",
+        "status": "pending",
+        "totalAmount": 4500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-24",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-24",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-11",
+        "endTime": "09:00:00",
+        "id": "booking-25",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "08:00:00",
+        "status": "pending",
+        "totalAmount": 6000,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-25",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-25",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-11",
+        "endTime": "09:00:00",
+        "id": "booking-26",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "08:00:00",
+        "status": "pending",
+        "totalAmount": 6000,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-26",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-26",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-11",
+        "endTime": "09:00:00",
+        "id": "booking-27",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "08:00:00",
+        "status": "pending",
+        "totalAmount": 6000,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-27",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-27",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-11",
+        "endTime": "09:00:00",
+        "id": "booking-28",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "08:00:00",
+        "status": "pending",
+        "totalAmount": 4500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-28",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-28",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-26",
+        "endTime": null,
+        "id": "booking-29",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1400,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-29",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-29",
+            "type": "Football Turf"
+        }
+    },
+    {
+        "date": "2025-06-20",
+        "endTime": null,
+        "id": "booking-30",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-30",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-30",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-20",
+        "endTime": null,
+        "id": "booking-31",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-31",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-31",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-20",
+        "endTime": null,
+        "id": "booking-32",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-32",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-32",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-20",
+        "endTime": null,
+        "id": "booking-33",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-33",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-33",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-20",
+        "endTime": null,
+        "id": "booking-34",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-34",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-34",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-20",
+        "endTime": null,
+        "id": "booking-35",
+        "slots": [],
+        "startTime": null,
+        "status": "pending",
+        "totalAmount": 1500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-35",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-35",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-11",
+        "endTime": "11:00:00",
+        "id": "booking-36",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "10:00:00",
+        "status": "pending",
+        "totalAmount": 6000,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-36",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-36",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-11",
+        "endTime": "09:00:00",
+        "id": "booking-37",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "08:00:00",
+        "status": "pending",
+        "totalAmount": 4500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-37",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-37",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-12",
+        "endTime": "09:00:00",
+        "id": "booking-38",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "08:00:00",
+        "status": "pending",
+        "totalAmount": 4500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-38",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-38",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-12",
+        "endTime": "09:00:00",
+        "id": "booking-39",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "08:00:00",
+        "status": "pending",
+        "totalAmount": 7500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-39",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-39",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-12",
+        "endTime": "07:00:00",
+        "id": "booking-40",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "06:00:00",
+        "status": "pending",
+        "totalAmount": 4200,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-40",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-40",
+            "type": "Football Turf"
+        }
+    },
+    {
+        "date": "2025-06-12",
+        "endTime": "09:00:00",
+        "id": "booking-41",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "08:00:00",
+        "status": "pending",
+        "totalAmount": 4500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-41",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-41",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-12",
+        "endTime": "14:00:00",
+        "id": "booking-42",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "13:00:00",
+        "status": "pending",
+        "totalAmount": 4500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-42",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-42",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-12",
+        "endTime": "11:00:00",
+        "id": "booking-43",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "10:00:00",
+        "status": "pending",
+        "totalAmount": 4500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-43",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-43",
+            "type": "Cricket Turf"
+        }
+    },
+    {
+        "date": "2025-06-12",
+        "endTime": "12:00:00",
+        "id": "booking-44",
+        "slots": [
+            [Object
+            ],
+            [Object
+            ],
+            [Object
+            ]
+        ],
+        "startTime": "11:00:00",
+        "status": "pending",
+        "totalAmount": 4500,
+        "venue": {
+            "coordinates": [Object
+            ],
+            "id": "venue-44",
+            "images": [Array
+            ],
+            "location": "Location not available",
+            "name": "Gorilla Cage",
+            "slug": "venue-44",
+            "type": "Cricket Turf"
+        }
+    }
+]
