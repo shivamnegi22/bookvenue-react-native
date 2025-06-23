@@ -1,12 +1,11 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
-import { Home, CalendarClock, Plus, MapPin, User } from 'lucide-react-native';
-import { View, Text, StyleSheet } from 'react-native';
+import { Chrome as Home, CalendarClock, CreditCard, MapPin, User } from 'lucide-react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 
 export default function TabLayout() {
   const { user } = useAuth();
-  const isVenueOwner = user?.isVenueOwner;
 
   return (
     <Tabs
@@ -16,6 +15,7 @@ export default function TabLayout() {
         tabBarInactiveTintColor: '#6B7280',
         tabBarLabelStyle: styles.tabBarLabel,
         headerShown: false,
+        tabBarHideOnKeyboard: true, // Hide tab bar when keyboard is open
       }}
     >
       <Tabs.Screen
@@ -36,25 +36,15 @@ export default function TabLayout() {
           ),
         }}
       />
-      {isVenueOwner && (
-        <Tabs.Screen
-          name="add-venue"
-          options={{
-            title: 'Add Venue',
-            tabBarIcon: ({ color }) => (
-              <View style={styles.addVenueIconContainer}>
-                <Plus size={24} color="#FFFFFF" />
-              </View>
-            ),
-            tabBarLabel: ({ focused }) => (
-              <Text style={[
-                styles.tabBarLabel,
-                focused ? styles.tabBarLabelFocused : null
-              ]}>Add</Text>
-            ),
-          }}
-        />
-      )}
+      <Tabs.Screen
+        name="payments"
+        options={{
+          title: 'Payments',
+          tabBarIcon: ({ color, size }) => (
+            <CreditCard size={size} color={color} />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="bookings"
         options={{
@@ -82,24 +72,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
-    height: 60,
-    paddingBottom: 6,
-    paddingTop: 6,
+    height: Platform.OS === 'ios' ? 88 : 64, // Account for home indicator on iOS
+    paddingBottom: Platform.OS === 'ios' ? 34 : 10, // Safe area for iOS
+    paddingTop: 8,
+    position: 'absolute', // Make tab bar float above content
+    bottom: 0,
+    left: 0,
+    right: 0,
+    elevation: 8, // Android shadow
+    shadowColor: '#000', // iOS shadow
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   tabBarLabel: {
     fontFamily: 'Inter-Medium',
     fontSize: 12,
-  },
-  tabBarLabelFocused: {
-    color: '#2563EB',
-  },
-  addVenueIconContainer: {
-    backgroundColor: '#2563EB',
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: Platform.OS === 'ios' ? 0 : 4,
   },
 });
