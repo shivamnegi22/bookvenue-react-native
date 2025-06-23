@@ -13,6 +13,7 @@ import { SplashScreen } from 'expo-router';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StripeProvider } from '@stripe/stripe-react-native';
+import { openRazorpayCheckout } from '@/utils/razorpay';
 import Constants from 'expo-constants';
 
 // Prevent splash screen from auto-hiding

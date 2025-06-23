@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { venueApi } from '@/api/venueApi';
 import { Venue, VenueService, VenueCourt } from '@/types/venue';
-import { ArrowLeft, Star, MapPin, Clock, DollarSign, Calendar, ArrowRight, ChevronRight } from 'lucide-react-native';
+import { ArrowLeft, Star, MapPin, Clock, IndianRupee, Calendar, ArrowRight, ChevronRight } from 'lucide-react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 export default function VenueDetailScreen() {
@@ -232,7 +232,7 @@ export default function VenueDetailScreen() {
             </View>
             
             <View style={styles.infoItem}>
-              <DollarSign size={16} color="#2563EB" />
+              <IndianRupee size={16} color="#2563EB" />
               <Text style={styles.infoText}>
                 ₹{selectedCourt ? selectedCourt.slot_price : venue.pricePerHour}/hour
               </Text>

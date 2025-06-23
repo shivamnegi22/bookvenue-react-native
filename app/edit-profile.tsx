@@ -160,7 +160,7 @@ export default function EditProfileScreen() {
                   <TextInput
                     style={[styles.input, styles.textArea]}
                     placeholder="Enter your address"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor="#9CA3AF" 
                     value={values.address}
                     onChangeText={handleChange('address')}
                     onBlur={handleBlur('address')}

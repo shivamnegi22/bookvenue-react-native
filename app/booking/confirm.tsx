@@ -7,7 +7,7 @@ import { bookingApi } from '@/api/bookingApi';
 import { Venue } from '@/types/venue';
 import { useAuth } from '@/contexts/AuthContext';
 import { User} from 'lucide-react-native';
-import { ArrowLeft, MapPin, Calendar, Clock, DollarSign, CreditCard, CircleCheck as CheckCircle2 } from 'lucide-react-native';
+import { ArrowLeft, MapPin, Calendar, Clock, IndianRupee, CreditCard, CircleCheck as CheckCircle2 } from 'lucide-react-native';
 import RazorpayCheckout from 'react-native-razorpay';
 
 // Razorpay types
@@ -330,7 +330,7 @@ export default function BookingConfirmScreen() {
             </View>
 
             <View style={styles.detailItem}>
-              <DollarSign size={20} color="#2563EB" />
+              <IndianRupee size={20} color="#2563EB" />
               <View style={styles.detailTextContainer}>
                 <Text style={styles.detailLabel}>Price per slot</Text>
                 <Text style={styles.detailValue}>₹{price}</Text>

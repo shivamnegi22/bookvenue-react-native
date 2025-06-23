@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { bookingApi } from '@/api/bookingApi';
 import { Booking } from '@/types/booking';
 import { CalendarClock, MapPin, Clock, CalendarCheck, CalendarX, RotateCcw } from 'lucide-react-native';
+import venue from '@/api/venueApi';
 
 export default function BookingsScreen() {
   const router = useRouter();
@@ -19,7 +20,7 @@ export default function BookingsScreen() {
         setLoading(true);
         setError(null);
         const response = await bookingApi.getBookings();
-        // console.log('new Fetched bookings:', response);
+        //  console.log('new Fetched bookings:', response);
         setBookings(response);
       } catch (error: any) {
         console.error('Error fetching bookings:', error);
@@ -31,6 +32,17 @@ export default function BookingsScreen() {
 
     fetchBookings();
   }, []);
+  const formattedTime = (time: string) => {
+    if (!time) return 'Invalid Time';
+    try {
+      const [hours, minutes] = time.split(':').map(Number);
+      const date = new Date();
+      date.setHours(hours, minutes, 0, 0);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (error) {
+      return 'Invalid Time';
+    }
+  };
 
   const upcomingBookings = bookings.filter(booking => {
     const bookingDateTime = new Date(booking.date + 'T' + booking.startTime);
@@ -85,7 +97,7 @@ export default function BookingsScreen() {
             <Text style={styles.venueName}>{item.name}</Text>
             <View style={styles.locationContainer}>
               <MapPin size={14} color="#6B7280" />
-              {/* <Text style={styles.locationText}>{item.venue.location}</Text> */}
+              <Text style={styles.locationText}>{}</Text>
             </View>
             {item.court && (
               <Text style={styles.venueType}>{item.court}</Text>
@@ -101,7 +113,7 @@ export default function BookingsScreen() {
           
           <View style={styles.detailItem}>
             <Clock size={16} color="#2563EB" />
-            <Text style={styles.detailText}>{item.startTime} - {item.endTime}</Text>
+            <Text style={styles.detailText}>{formattedTime(item.startTime)} - {formattedTime(item.endTime)}</Text>
           </View>
         </View>
         
@@ -220,7 +232,7 @@ export default function BookingsScreen() {
       ) : (
         <FlatList
           data={activeTab === 'upcoming' ? upcomingBookings : pastBookings}
-          renderItem={renderBookingItem}
+          renderItem={renderBookingItem} 
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={renderEmptyComponent}

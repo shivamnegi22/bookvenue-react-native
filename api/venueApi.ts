@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Venue } from '@/types/venue';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_URL = 'https://admin.bookvenue.app/api';
 
@@ -10,6 +11,13 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   }
+});
+api.interceptors.request.use(async (config) => {
+  const token = await AsyncStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export const venueApi = {
@@ -101,6 +109,15 @@ export const venueApi = {
       console.error('Error fetching venue by slug:', error);
       throw new Error('Venue not found');
     }
+  },
+  createVenue: async (venueData: any) => {
+    try {
+      const response = await api.post('/create-facility', venueData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating venue:', error);
+      throw new Error('Failed to create venue');
+    }
   }
-  
+
 };

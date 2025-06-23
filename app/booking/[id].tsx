@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { bookingApi } from '@/api/bookingApi';
 import { Booking } from '@/types/booking';
-import { ArrowLeft, MapPin, Calendar, Clock, DollarSign, CheckCircle2, XCircle, Share2 } from 'lucide-react-native';
+import { ArrowLeft, MapPin, Calendar, Clock, IndianRupee, CheckCircle2, XCircle, Share2 } from 'lucide-react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 export default function BookingDetailScreen() {
@@ -211,7 +211,7 @@ export default function BookingDetailScreen() {
           </View>
           
           <View style={styles.infoItem}>
-            <DollarSign size={20} color="#2563EB" />
+            <IndianRupee size={20} color="#2563EB" />
             <View style={styles.infoTextContainer}>
               <Text style={styles.infoLabel}>Total Amount</Text>
               <Text style={styles.infoValue}>${booking.totalAmount.toFixed(2)}</Text>

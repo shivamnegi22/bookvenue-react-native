@@ -16,9 +16,14 @@
       "output": "single",
       "favicon": "./assets/images/BookVenue_Logo.png"
     },
-    "plugins": ["expo-router", "expo-font", "expo-web-browser"],
+    "plugins": ["expo-router", "expo-font", "expo-web-browser","expo-image-picker"],
     "experiments": {
       "typedRoutes": true
+    },
+    "splash": {
+      "image": "./assets/images/Splash-screen.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
     }
   }
 }

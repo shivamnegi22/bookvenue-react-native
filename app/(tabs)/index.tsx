@@ -68,10 +68,10 @@ export default function HomeScreen() {
             <Text style={styles.welcomeText}>
               Hello, {user?.name?.split(' ')[0] || 'Guest'}
             </Text>
-            {/* <View style={styles.locationContainer}>
+            <View style={styles.locationContainer}>
               <MapPin size={16} color="#6B7280" />
-              <Text style={styles.locationText}>San Francisco, CA</Text>
-            </View> */}
+              <Text style={styles.locationText}>{user?.address}</Text>
+            </View>
           </View>
           <TouchableOpacity 
             style={styles.profileImageContainer}

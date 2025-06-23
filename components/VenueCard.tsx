@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Venue } from '@/types/venue';
-import { MapPin, Star, DollarSign } from 'lucide-react-native';
+import { MapPin, Star, IndianRupee } from 'lucide-react-native';
 
 type VenueCardProps = {
   venue: Venue;
