@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { bookingApi } from '@/api/bookingApi';
 import { Booking } from '@/types/booking';
 import { CalendarClock, MapPin, Clock, CalendarCheck, CalendarX, RotateCcw } from 'lucide-react-native';
-import venue from '@/api/venueApi';
+import { venueApi } from '@/api/venueApi';
 
 export default function BookingsScreen() {
   const router = useRouter();
@@ -94,14 +94,15 @@ export default function BookingsScreen() {
             />
           </View> */}
           <View style={styles.bookingInfo}>
-            <Text style={styles.venueName}>{item.name}</Text>
+            <Text style={styles.venueName}>{item.venue.name}</Text>
             <View style={styles.locationContainer}>
               <MapPin size={14} color="#6B7280" />
               <Text style={styles.locationText}>{}</Text>
             </View>
-            {item.court && (
-              <Text style={styles.venueType}>{item.court}</Text>
-            )}
+            {/* Replace 'court' with the correct property if available, e.g., 'venueType' or remove if not needed */}
+            {/* {item.venueType && (
+              <Text style={styles.venueType}>{item.venueType}</Text>
+            )} */}
           </View>
         </View>
         
